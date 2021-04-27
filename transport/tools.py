@@ -11,3 +11,7 @@ def get_station_network(station):
 def add_station_db(station, network, station_type):
 	Station.objects.get_or_create(station = station, network = network, station_type = station_type)
 
+def drop_table():
+	Station.objects.all().delete()
+
+

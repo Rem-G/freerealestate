@@ -7,7 +7,7 @@
 import requests
 from .tools import *
 
-class Tcl:
+class TCL:
     def __init__(self) -> None:
         self.network = "Tcl"
         self.data = requests.get("https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclarret/all.json?maxfeatures=-1&start=1")
@@ -18,6 +18,7 @@ class Tcl:
         bus = requests.get(url, headers = self.headers)
         ligne = []
         for i in bus.json()["records"]:
+            print(i.get("fields"), "\n")
             titan = i["fields"]["code_titan"].upper()
             titan = titan[0:-2] + ":" + titan[-2:-1]
             ligne.append(titan)

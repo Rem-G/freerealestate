@@ -31,4 +31,3 @@ class Star:
 
         for bus_station in self.get_bus_stations():
             add_station_db(bus_station.get("fields").get("nomarret"), self.network, "bus")
-            # print(bus_station.get("fields").get("nomarret"))
