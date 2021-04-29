@@ -20,3 +20,7 @@ def create_db(request):
 	ilevia.create_stations_db()
 	star.create_stations_db()
 	return JsonResponse({"Done": True})
+
+def test(request):
+	ilevia.get_subway_data()
+	return JsonResponse({"Done": True})
