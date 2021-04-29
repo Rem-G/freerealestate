@@ -57,6 +57,6 @@ class Ilevia:
             response_passage = requests.get(url_passage.format(stop)).json()
 
             for record in response_passage["records"]:
-                info.append({"direction" : record["fields"]["sensligne"], "horraire" : record["fields"]["heureestimeedepart"], "type" : "Bus"})
+                info.append({"direction" : record["fields"]["sensligne"], "horraire" : record["fields"]["heureestimeedepart"], "type" : "Streetcar"})
 
         return info
