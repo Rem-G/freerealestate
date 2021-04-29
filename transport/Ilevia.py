@@ -2,6 +2,7 @@
 
 import requests
 import json
+from .tools import *
 
 class Ilevia:
 
@@ -27,13 +28,13 @@ class Ilevia:
 
     def create_stations_db(self):
         for metro_station in self.get_subway_stops():
-            add_station_db(metro_station, self.network, "metro")
+            add_station_db(metro_station, self.network)
 
         for bus_station in self.get_bus_stops():
-            add_station_db(bus_station, self.network, "bus")
+            add_station_db(bus_station, self.network)
 
         for streetcar_station in self.get_streetcar_stops():
-            add_station_db(streetcar_station, self.network, "tramway")
+            add_station_db(streetcar_station, self.network)
 
 
     def get_info_at_stop(self, stop):

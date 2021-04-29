@@ -29,7 +29,7 @@ class Star:
 
     def create_stations_db(self):
         for metro_station in self.get_metro_stations():
-            add_station_db(metro_station.get("fields").get("nomarret"), self.network, "metro")
+            add_station_db(metro_station.get("fields").get("nomarret"), self.network)
 
         for bus_station in self.get_bus_stations():
-            add_station_db(bus_station.get("fields").get("nomarret"), self.network, "bus")
+            add_station_db(bus_station.get("fields").get("nomarret"), self.network)

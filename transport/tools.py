@@ -8,8 +8,8 @@ def get_station_network(station):
 	else:
 		return []
 
-def add_station_db(station, network, station_type):
-	Station.objects.get_or_create(station = station, network = network, station_type = station_type)
+def add_station_db(station, network):
+	Station.objects.update_or_create(station = station, network = network)
 
 def drop_table():
 	Station.objects.all().delete()
