@@ -1,4 +1,5 @@
 from .models import Station
+import requests
 
 def get_station_network(station):
 	queryset = Station.objects.filter(station__contains = station)
@@ -14,4 +15,10 @@ def add_station_db(station, network):
 def drop_table():
 	Station.objects.all().delete()
 
+def request(url, headers={}):
+	res = requests.get(url, headers=headers)
 
+	if res.status_code == 200:
+		return res.json()
+	else:
+		return []
