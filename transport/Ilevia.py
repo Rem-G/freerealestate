@@ -2,7 +2,6 @@
 
 import requests
 import json
-from .tools import *
 
 class Ilevia:
 
@@ -18,6 +17,7 @@ class Ilevia:
         url_streetcar_stop = "https://opendata.lillemetropole.fr/api/records/1.0/search/?dataset=tramway-arrets&rows=10000"
         response_streetcar_stop = requests.get(url_streetcar_stop).json()
         return [record["fields"]["nom_statio"].upper() for record in response_streetcar_stop["records"]]
+
 
     def get_subway_stops(self):
         url_subway_stop = "https://opendata.lillemetropole.fr/api/records/1.0/search/?dataset=stations-metro&rows=10000"
