@@ -1,6 +1,8 @@
 import requests
 from .tools import *
 
+#https://data.explore.star.fr/explore/?sort=title
+
 class Star:
     def __init__(self):
         self.network = "Star"
