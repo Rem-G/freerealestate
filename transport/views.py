@@ -20,3 +20,7 @@ def create_db(request):
 	ilevia.create_stations_db()
 	star.create_stations_db()
 	return JsonResponse({"Done": True})
+
+def get_next_departure(request, station):
+	res = star.get_station_next_depart(station)
+	return JsonResponse({"next_departures": res})
