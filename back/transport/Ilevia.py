@@ -60,7 +60,7 @@ class Ilevia:
         subway_stop_times_df = subway_stop_times_df.loc[:, ['stop_id','trip_id']]
 
         subway_routes_df = pd.read_csv('static/gtfs_Ilevia/routes.txt')
-        subway_routes_df = subway_routes_df[subway_routes_df["route_id"].str.contains("(ME1|ME2)[^R]")] # REGEX A REVOIR
+        subway_routes_df = subway_routes_df[subway_routes_df["route_id"].str.contains("^(ME1|ME2)")]
         print("\n\nTEST\n", subway_routes_df.head(5), "\n")
         subway_routes_df = subway_routes_df.loc[:,['route_id','route_short_name']]
 
