@@ -1,5 +1,5 @@
 # https://opendata.lillemetropole.fr/explore/?sort=modified&q=ilevia
-
+from django.conf import settings
 import requests
 import json
 import pandas as pd
@@ -9,6 +9,8 @@ class Ilevia:
 
     def __init__(self):
         self.network = "Ilevia"
+        self.static_path = settings.STATICFILES_DIRS[0]
+        print(self.static_path+"/gtfs_Ilevia/stops.txt")
 
     def get_bus_stops(self):
         url_bus_stop = "https://opendata.lillemetropole.fr/api/records/1.0/search/?dataset=arrets-bus&rows=10000"
@@ -53,14 +55,14 @@ class Ilevia:
         return info
 
     def get_subway_data(self):
-        subway_stops_df = pd.read_csv("static/gtfs_Ilevia/stops.txt")
+        subway_stops_df = pd.read_csv(self.static_path+"/gtfs_Ilevia/stops.txt")
         subway_stops_df = subway_stops_df.loc[:, ['stop_name','stop_id']]
 
-        subway_stop_times_df = pd.read_csv("static/gtfs_Ilevia/stop_times.txt")
+        subway_stop_times_df = pd.read_csv(self.static_path+"/gtfs_Ilevia/stop_times.txt")
         subway_stop_times_df = subway_stop_times_df.loc[:, ['stop_id','trip_id']]
 
-        subway_routes_df = pd.read_csv('static/gtfs_Ilevia/routes.txt')
-        subway_routes_df = subway_routes_df[subway_routes_df["route_id"].str.contains("(ME1|ME2)[^R]")] # REGEX A REVOIR
+        subway_routes_df = pd.read_csv(self.static_path+'/gtfs_Ilevia/routes.txt')
+        subway_routes_df = subway_routes_df[subway_routes_df["route_id"].str.contains("^(ME1|ME2)")] # REGEX A REVOIR
         print("\n\nTEST\n", subway_routes_df.head(5), "\n")
         subway_routes_df = subway_routes_df.loc[:,['route_id','route_short_name']]
 
