@@ -1,14 +1,17 @@
 # https://opendata.lillemetropole.fr/explore/?sort=modified&q=ilevia
-
+from django.conf import settings
 import requests
 import json
 import pandas as pd
+import numpy as np
 from .tools import *
 
 class Ilevia:
 
     def __init__(self):
         self.network = "Ilevia"
+        self.static_path = settings.STATICFILES_DIRS[0]
+        print(self.static_path+"/gtfs_Ilevia/stops.txt")
 
     def get_bus_stops(self):
         url_bus_stop = "https://opendata.lillemetropole.fr/api/records/1.0/search/?dataset=arrets-bus&rows=10000"
@@ -52,46 +55,68 @@ class Ilevia:
 
         return info
 
+    # https://mrcagney.github.io/gtfstk_docs/
+    # https://towardsdatascience.com/python-for-gtfs-segment-frequencies-in-a-map-4dc3bc1e26ff
+
     def get_subway_data(self):
-        subway_stops_df = pd.read_csv("static/gtfs_Ilevia/stops.txt")
+        subway_stops_df = pd.read_csv(self.static_path+"/gtfs_Ilevia/stops.txt")
         subway_stops_df = subway_stops_df.loc[:, ['stop_name','stop_id']]
 
-        subway_stop_times_df = pd.read_csv("static/gtfs_Ilevia/stop_times.txt")
-        subway_stop_times_df = subway_stop_times_df.loc[:, ['stop_id','trip_id']]
+        subway_stop_times_df = pd.read_csv(self.static_path+"/gtfs_Ilevia/stop_times.txt")
+        subway_stop_times_df = subway_stop_times_df.loc[:, ['stop_id','trip_id', 'departure_time']]
 
-        subway_routes_df = pd.read_csv('static/gtfs_Ilevia/routes.txt')
+        subway_routes_df = pd.read_csv(self.static_path+'/gtfs_Ilevia/routes.txt')
         subway_routes_df = subway_routes_df[subway_routes_df["route_id"].str.contains("^(ME1|ME2)")]
-        print("\n\nTEST\n", subway_routes_df.head(5), "\n")
         subway_routes_df = subway_routes_df.loc[:,['route_id','route_short_name']]
 
-        subway_trips_df = pd.read_csv('static/gtfs_Ilevia/trips.txt')
+        subway_trips_df = pd.read_csv(self.static_path+'/gtfs_Ilevia/trips.txt')
+        subway_trips_df = subway_trips_df[subway_trips_df["route_id"].str.contains("^(ME1|ME2)")]
         subway_trips_df = subway_trips_df.loc[:,['route_id', 'trip_id']]
 
-        subway_stop_times_df = subway_stop_times_df.loc[range(100), :]
+        trip_ids = subway_trips_df['trip_id'].unique()
 
-        id_ = []
-        nom = []
-        nom_arretb =[]
-        for i in range(len(subway_stop_times_df)):
-            id_route = str(list(subway_trips_df[subway_trips_df['trip_id'] == subway_stop_times_df.loc[i,'trip_id']]['route_id'])[0])
-            print("\n\nTEST\n", subway_routes_df[subway_routes_df['route_id'] == id_route]['route_short_name'], "\n")
-            nom_route =  str(list(subway_routes_df[subway_routes_df['route_id'] == id_route]['route_short_name'])[0])
-            nom_arret = str(list(subway_stops_df[subway_stops_df['stop_id'] == str(subway_stop_times_df.loc[i,'stop_id'])]['stop_name'])[0])
+        # route_id = str(list(subway_trips_df[subway_trips_df['route_id'] == "ME2"]['trip_id'])).split("'")[1]
+        subway_stop_times_df = subway_stop_times_df[subway_stop_times_df["trip_id"].isin([4281595, 4281597, 4281599])]
 
-            id_.append(id_route)
-            nom.append(nom_route)
-            nom_arretb.append(nom_arret)
+        for index, row in subway_stop_times_df.iterrows():
+            # Merci les Lillois !
+            if row['departure_time'].split(":")[0] == "24":
+                subway_stop_times_df.loc[index, 'departure_time'] = ":".join(["00"] + row['departure_time'].split(":")[1:])
 
+            elif row['departure_time'].split(":")[0] == "25":
+                subway_stop_times_df.loc[index, 'departure_time'] = ":".join(["00"] + row['departure_time'].split(":")[1:])
 
-        subway_stop_times_df['id_route'] =  id_
-        subway_stop_times_df['nom_route'] = nom
-        subway_stop_times_df['nom_arret'] = nom_arretb
+        subway_stop_times_df['departure_time'] = pd.to_datetime(subway_stop_times_df.departure_time, format='%H:%M:%S').dt.time
+        # subway_stop_times_df.sort_values('departure_time', ascending=True)
 
+        subway_stop_times_df.set_index('departure_time', verify_integrity=False)
+        subway_stop_times_df = subway_stop_times_df.sort_index()
 
-        del subway_stop_times_df['trip_id']
-        subway_stop_times_df = subway_stop_times_df.drop_duplicates()
+        print(subway_stop_times_df)
 
-        print(subway_stop_times_df.head(5))
+        #subway_stop_times_df = subway_stop_times_df[subway_stop_times_df["trip_id"].isin(trip_ids)]
+
+        # id_ = []
+        # names = []
+        # stops_name =[]
+        # for i in range(len(subway_stop_times_df)):
+        #     print((i/len(subway_stop_times_df))*100,"%")
+        #     route_id = str(list(subway_trips_df[subway_trips_df['trip_id'] == subway_stop_times_df.iloc[i]['trip_id']]['route_id'])).split("'")[1]
+        #     route_name =  str(list(subway_routes_df[subway_routes_df['route_id'] == route_id]['route_short_name']))
+        #     stop_name = str(list(subway_stops_df[subway_stops_df['stop_id'] == str(subway_stop_times_df.iloc[i]['stop_id'])]['stop_name']))
+
+        #     id_.append(route_id)
+        #     names.append(route_name)
+        #     stops_name.append(stop_name)
+
+        # subway_stop_times_df['route_id'] =  id_
+        # subway_stop_times_df['route_name'] = names
+        # subway_stop_times_df['stop_name'] = stops_name
+
+        # del subway_stop_times_df['trip_id']
+        # subway_stop_times_df = subway_stop_times_df.drop_duplicates()
+
+        # print(subway_stop_times_df.head(100))
 
         return 0
 
