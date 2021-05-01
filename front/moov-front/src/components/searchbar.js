@@ -1,36 +1,26 @@
 import React, {useState} from 'react';
-import "../style/searchbar.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGreaterThan } from '@fortawesome/free-solid-svg-icons'
 import axios from "axios";
+import "../style/searchbar.css";
 
-function SearchBar({station, updateStation, searchReq, updateSearchReq}){
+function SearchBar({station, updateStation}){
     const [suggestions, updateSuggestions] = useState([])
 
     const onChangeHandler = event => {
         axios
 			.get(`http://127.0.0.1:8000/api/transport/station/${event.target.value}`)
 			.then(response => {
-				let tempData = [];
-				if(response.data.network.length > 5){
-					for (let i = 0; i < 5; i++){
-						tempData.push(response.data.network[i]);
-					}
-					updateSuggestions(response.data.network);
-				}
-				else{
-					updateSuggestions(response.data.network);
-				}
-
+				updateSuggestions(response.data.network);
 			}) 
 			.catch(err => {console.log(err); updateSuggestions([])});
 	  };
 
 	const fetchStation = (req_station) => {
 		axios
-		.get(`http://127.0.0.1:8000/api/transport/station/${req_station}`)
+		.get('http://127.0.0.1:8000/api/transport/station/'+req_station)
 		.then(response => {
-			updateStation(response.data.network[0]);
+			response.data.network.forEach(element => {
+				if (element.station == req_station) { updateStation(element); }
+			});
 		}) 
 		.catch(err => {console.log(err);});
 	};
@@ -39,22 +29,14 @@ function SearchBar({station, updateStation, searchReq, updateSearchReq}){
 		const res = event.target.textContent.split(' ');
 		res.pop();
 		const req_station = res.join(' ');
-		updateSearchReq(req_station);
 		updateSuggestions([]);
 		fetchStation(req_station);
 	};
 
-	const handleKeyDown = (e) => {
-		if (e.key === 'Enter') {
-			handleSubmit(e);
-		 }
-	}
-
 	return (
 		<div className="searchbar">
 			<div className="search-box searchbar">
-				<input type="text" name="" className="search-txt" placeholder="Trouver une station" onChange={onChangeHandler} onKeyDown={handleKeyDown}/>
-				<FontAwesomeIcon className="search-btn" icon={faGreaterThan} onClick={handleSubmit} />
+				<input type="text" name="" className="search-txt" placeholder="Trouver une station" onChange={onChangeHandler}/>
 			</div>
 			<div className="searchbar-results">
 			{suggestions.map((suggestion, index) =>(
