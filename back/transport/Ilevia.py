@@ -53,12 +53,14 @@ class Ilevia:
                         "direction" : record["fields"]["sensligne"],
                         "horraire" : record["fields"]["heureestimeedepart"]})
 
+        print(info)
+
         return info
 
     # https://mrcagney.github.io/gtfstk_docs/
     # https://towardsdatascience.com/python-for-gtfs-segment-frequencies-in-a-map-4dc3bc1e26ff
 
-    def get_subway_data(self):
+    def get_info_at_subway_stop(self, stop):
         subway_stops_df = pd.read_csv(self.static_path+"/gtfs_Ilevia/stops.txt")
         subway_stops_df = subway_stops_df.loc[:, ['stop_name','stop_id']]
 
@@ -75,11 +77,16 @@ class Ilevia:
 
         trip_ids = subway_trips_df['trip_id'].unique()
 
+
+        subway_stops_df["stop_name"] = subway_stops_df["stop_name"].apply(lambda x: x.upper())
+        subway_stops_df = subway_stops_df[subway_stops_df["stop_name"] == stop.upper()]
+        stop_ids = subway_stops_df["stop_id"].unique()
+
         # route_id = str(list(subway_trips_df[subway_trips_df['route_id'] == "ME2"]['trip_id'])).split("'")[1]
-        subway_stop_times_df = subway_stop_times_df[subway_stop_times_df["trip_id"].isin([4281595, 4281597, 4281599])]
+        subway_stop_times_df = subway_stop_times_df[subway_stop_times_df["stop_id"].isin([stop_ids[0]])]
+        subway_stop_times_df["departure_time"].unique()
 
         for index, row in subway_stop_times_df.iterrows():
-            # Merci les Lillois !
             if row['departure_time'].split(":")[0] == "24":
                 subway_stop_times_df.loc[index, 'departure_time'] = ":".join(["00"] + row['departure_time'].split(":")[1:])
 
@@ -119,6 +126,3 @@ class Ilevia:
         # print(subway_stop_times_df.head(100))
 
         return 0
-
-    def get_info_at_subway_stop(self, stop):
-        pass
