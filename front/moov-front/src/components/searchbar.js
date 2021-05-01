@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGreaterThan } from '@fortawesome/free-solid-svg-icons'
 import axios from "axios";
 
-function SearchBar({searchReq, updateSearchReq}){
+function SearchBar({station, updateStation, searchReq, updateSearchReq}){
     const [suggestions, updateSuggestions] = useState([])
 
     const onChangeHandler = event => {
@@ -26,11 +26,22 @@ function SearchBar({searchReq, updateSearchReq}){
 			.catch(err => {console.log(err); updateSuggestions([])});
 	  };
 
+	const fetchStation = (req_station) => {
+		axios
+		.get(`http://127.0.0.1:8000/api/transport/station/${req_station}`)
+		.then(response => {
+			updateStation(response.data.network[0]);
+		}) 
+		.catch(err => {console.log(err);});
+	};
+
 	const handleSubmit = event => {
 		const res = event.target.textContent.split(' ');
 		res.pop();
-		updateSearchReq(res.join(' '));
+		const req_station = res.join(' ');
+		updateSearchReq(req_station);
 		updateSuggestions([]);
+		fetchStation(req_station);
 	};
 
 	const handleKeyDown = (e) => {

@@ -13,9 +13,9 @@ export default function Transport({station, updateStation, searchReq, updateSear
 
 	return(
 		<div >
-			<SearchBar searchReq={searchReq} updateSearchReq={updateSearchReq}/>
+			<SearchBar station={station} updateStation={updateStation} searchReq={searchReq} updateSearchReq={updateSearchReq}/>
 			<div className="map r1 c1">
-				<Map/>
+				<Map station={station}/>
 			</div>
 		</div>
 	);
