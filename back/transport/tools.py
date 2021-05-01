@@ -9,8 +9,8 @@ def get_station_network(station):
 	else:
 		return []
 
-def add_station_db(station, network):
-	Station.objects.update_or_create(station = station, network = network)
+def add_station_db(station, network, lat=2.349014, lon=48.864716):
+	Station.objects.update_or_create(station = station, network = network, lat = lat, lon = lon)
 
 def drop_table():
 	Station.objects.all().delete()
