@@ -1,8 +1,16 @@
 from .models import Station
 import requests
 
-def get_station_network(station):
+def get_station_suggestions(station):
 	queryset = Station.objects.filter(station__contains = station)
+	data = list(queryset.values())
+	if len(data):
+		return data
+	else:
+		return []
+
+def get_station(station):
+	queryset = Station.objects.filter(station = station)
 	data = list(queryset.values())
 	if len(data):
 		return data
