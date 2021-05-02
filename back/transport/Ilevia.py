@@ -1,4 +1,5 @@
 # https://opendata.lillemetropole.fr/explore/?sort=modified&q=ilevia
+
 from django.conf import settings
 import requests
 import json
@@ -64,6 +65,12 @@ class Ilevia:
         subway_stops_df = pd.read_csv(self.static_path+"/gtfs_Ilevia/stops.txt")
         subway_stops_df = subway_stops_df.loc[:, ['stop_name','stop_id']]
 
+        subway_calendar_date_df = pd.read_csv(self.static_path+"/gtfs_Ilevia/calendar_dates.txt")
+        subway_calendar_date_df = subway_calendar_date_df[subway_calendar_date_df["service_id"].str.contains("[^R](ME1|ME2)")]
+        subway_calendar_date_df = subway_calendar_date_df.loc[:, ['service_id']]
+
+        print(subway_calendar_date_df)
+
         subway_stop_times_df = pd.read_csv(self.static_path+"/gtfs_Ilevia/stop_times.txt")
         subway_stop_times_df = subway_stop_times_df.loc[:, ['stop_id','trip_id', 'departure_time']]
 
@@ -73,18 +80,18 @@ class Ilevia:
 
         subway_trips_df = pd.read_csv(self.static_path+'/gtfs_Ilevia/trips.txt')
         subway_trips_df = subway_trips_df[subway_trips_df["route_id"].str.contains("^(ME1|ME2)")]
-        subway_trips_df = subway_trips_df.loc[:,['route_id', 'trip_id']]
-
-        trip_ids = subway_trips_df['trip_id'].unique()
-
+        subway_trips_df = subway_trips_df.loc[:,['route_id', 'trip_id', 'service_id']]
 
         subway_stops_df["stop_name"] = subway_stops_df["stop_name"].apply(lambda x: x.upper())
         subway_stops_df = subway_stops_df[subway_stops_df["stop_name"] == stop.upper()]
+
+        trip_ids = subway_trips_df['trip_id'].unique()
+
         stop_ids = subway_stops_df["stop_id"].unique()
+        print("\n\nSTOPS IDS :\n", stop_ids)
 
         # route_id = str(list(subway_trips_df[subway_trips_df['route_id'] == "ME2"]['trip_id'])).split("'")[1]
-        subway_stop_times_df = subway_stop_times_df[subway_stop_times_df["stop_id"].isin([stop_ids[0]])]
-        subway_stop_times_df["departure_time"].unique()
+        subway_stop_times_df = subway_stop_times_df[subway_stop_times_df["stop_id"] == stop_ids[1]]
 
         for index, row in subway_stop_times_df.iterrows():
             if row['departure_time'].split(":")[0] == "24":
@@ -95,6 +102,9 @@ class Ilevia:
 
         subway_stop_times_df['departure_time'] = pd.to_datetime(subway_stop_times_df.departure_time, format='%H:%M:%S').dt.time
         # subway_stop_times_df.sort_values('departure_time', ascending=True)
+
+        print(trip_ids[0])
+        subway_stop_times_df = subway_stop_times_df[subway_stop_times_df['trip_id'] == 4139592]
 
         subway_stop_times_df.set_index('departure_time', verify_integrity=False)
         subway_stop_times_df = subway_stop_times_df.sort_index()
