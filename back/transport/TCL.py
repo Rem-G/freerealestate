@@ -1,36 +1,55 @@
-# https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-metro-et-funiculaire-du-reseau-tcl-grand-lyon&q=&facet=code_titan&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1&rows=10000
-# https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-bus-du-reseau-tcl-grand-lyon&facet=code_titan&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1&rows=10000
-# https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-tramway-du-reseau-tcl-grand-lyon&facet=code_titan&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1&rows=10000
-
-# https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclarret/all.json?maxfeatures=-1&start=1
-
-import requests
+from datetime import datetime, time
 from .tools import *
-
+from django.conf import settings
+import datetime
+import pandas as pd
+import os
 class TCL:
     def __init__(self) -> None:
-        self.network = "Tcl"
-        self.data = requests.get("https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclarret/all.json?maxfeatures=-1&start=1")
-        self.headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        self.network = "TCL"
+        self.static_path = settings.STATICFILES_DIRS[0]
+        self.df = pd.read_parquet(f'{self.static_path}/gtfs_tcl/arrets.parquet.gzip')
+        self.calendar =  pd.read_parquet(f'{self.static_path}/gtfs_tcl/calendar.parquet.gzip')
+        self.trips =  pd.read_parquet(f'{self.static_path}/gtfs_tcl/trips.parquet.gzip')
 
-    def get_bus_stations(self) -> list:
-        url = "https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-bus-du-reseau-tcl-grand-lyon&facet=code_titan&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1&rows=10000"
-        bus = requests.get(url, headers = self.headers)
-        ligne = []
-        for i in bus.json()["records"]:
-            print(i.get("fields"), "\n")
-            titan = i["fields"]["code_titan"].upper()
-            titan = titan[0:-2] + ":" + titan[-2:-1]
-            ligne.append(titan)
+    def create_stations_db(self):
+        for i in self.df.index:
+            add_station_db(self.df["stop_name"][i], self.network, self.df["lat"][i], self.df["lon"][i])
 
-        bus_id = []
-        for stop in self.data.json()["values"]:
-            dessert = stop["desserte"].split(",")
-            if len(list(set(dessert).intersection(ligne))) > 0:
-                bus_id.append(stop['nom'])
+    def rechercheService(self,stop_id, jour):
+        heure = []
+        id_route = list(self.df[self.df['stop_id'] == stop_id]['id_route'])[0]
+        trip = list(set(self.trips[self.trips['route_id'] == id_route]['service_id']))
+        for t in trip:
+            typeT = self.calendar[self.calendar['service_id'] == t]
+            if(list(typeT[jour])[0] == 1):
+                return t
 
-        return bus_id
+    def rechercheHeure(self,stop_id, jour):
+        path = "./dataV2/"
+        service = self.rechercheService(stop_id, jour)
+        type_transport = list(self.df[self.df['stop_id'] == stop_id]['type'])[0]
+        ensembleTrips = list(set(self.trips[self.trips['service_id'] == service]['trip_id']))
+        data = pd.read_parquet(f'{self.static_path}/gtfs_tcl/{type_transport}/{stop_id}.parquet.gzip')
+        return sorted(data[data['trip_id'].isin(ensembleTrips)]['departure_time'])
 
-    def create_station_db(self):
-        for bus_station in self.get_bus_stations():
-            add_station_db(bus_station, self.network, "bus")
+
+    def get_station_next_depart(self, station):
+        data = []
+        actuel = datetime.datetime.now().strftime('%H:%M:%S')
+        semaine = {0: 'monday',1: 'tuesday',2: 'wednesday',3: 'thursday',4: 'friday',5:'saturday',6: 'sunday'}
+        jour = semaine[ datetime.datetime.today().weekday()]
+        stations = self.df[self.df["stop_name"] == station]
+        for sta in stations.index:
+            print(stations['stop_id'][sta])
+            print(jour)
+            heures = self.rechercheHeure(stations['stop_id'][sta], jour)
+            donnee = []
+            for i in heures:
+                if len(donnee) > 5:
+                    break
+                if(i > actuel):
+                    donnee.append(i)
+            data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departure": donnee})
+
+        return data
