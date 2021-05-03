@@ -15,7 +15,7 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 function ChangeView({center, zoom}) {
-    if (center == [48.864716, 2.349014]){ zoom = 7 }
+    if (center === [48.864716, 2.349014]){ zoom = 7 }
     const map = useMap();
     map.setView(center, zoom);
     return null;
@@ -23,6 +23,7 @@ function ChangeView({center, zoom}) {
 
 export default function Map({station}){
     const [liveBus, updateLiveBus] = useState([]);
+    const [lines, updateLines] = useState([]);
 
     const fetchStarLiveBus = () => {
       axios
@@ -34,12 +35,34 @@ export default function Map({station}){
     }
 
     const fetchStarLines = () => {
-      axios.get("")
+      axios.get("https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000")
+      .then(response => {
+        const busLines = response.data.records;
+        // updateLines(response.data.records);
+
+        axios.get("https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000")
+        .then(response => {
+          const allLines = busLines.concat(response.data.records);
+
+          allLines.map((line, lineIndex) => {
+            console.log(line);
+            line.fields.parcours.coordinates.map((coor, index) => {
+              line.fields.parcours.coordinates[index] = [coor[1], coor[0]];
+            });
+            allLines[lineIndex] = line;
+          });
+
+          updateLines(allLines);
+        })
+        .catch(err => {console.log(err);});
+      })
+      .catch(err => {console.log(err);});
     }
 
     useEffect(() => {
-      if (station.network == "Star"){
+      if (station.network === "Star"){
         // setInterval(() => {fetchLiveBus();}, 60000);
+        fetchStarLines();
         fetchStarLiveBus();
       }
     // eslint-disable-next-line
@@ -68,6 +91,14 @@ export default function Map({station}){
             return (<Marker id={index} position={position} icon={icon} >
               <Popup>{bus.fields.nomcourtligne} destination {bus.fields.destination}</Popup>
             </Marker>)
+          })
+        }
+        {lines.length > 0 && 
+          lines.map((line, index) => {
+            const pathOptions = {color: line.fields.couleurtrace};
+            return(
+              <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates} />
+            )
           })
         }
       </MapContainer>
