@@ -27,35 +27,18 @@ export default function Map({station}){
 
     const fetchStarLiveBus = () => {
       axios
-        .get("https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-vehicules-geoposition-suivi-new-billetique-tr&q=&rows=10000")
+        .get("http://localhost:8000/api/transport/livebus/"+station.station+"/"+station.network)
         .then(response => {
-          updateLiveBus(response.data.records);
+          updateLiveBus(response.data.live);
         })
         .catch(err => {console.log(err);});
     }
 
     const fetchStarLines = () => {
-      axios.get("https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000")
+      axios.get("http://localhost:8000/api/transport/topo/"+station.station+"/"+station.network)
       .then(response => {
-        const busLines = response.data.records;
-        // updateLines(response.data.records);
-
-        axios.get("https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000")
-        .then(response => {
-          const allLines = busLines.concat(response.data.records);
-
-          allLines.map((line, lineIndex) => {
-            console.log(line);
-            line.fields.parcours.coordinates.map((coor, index) => {
-              line.fields.parcours.coordinates[index] = [coor[1], coor[0]];
-            });
-            allLines[lineIndex] = line;
-          });
-
-          updateLines(allLines);
+        updateLines(response.data.topo);
         })
-        .catch(err => {console.log(err);});
-      })
       .catch(err => {console.log(err);});
     }
 
@@ -81,7 +64,7 @@ export default function Map({station}){
         {liveBus.length > 0 && 
           liveBus.map((bus, index) => {
             // const imgUrl = "../static/img/"+bus.fields.nomcourtligne+".png";
-            const position = [bus.geometry.coordinates[1], bus.geometry.coordinates[0]];
+            const position = bus.geometry.coordinates;
             const icon = new L.icon({
               iconUrl: "https://i.ya-webdesign.com/images/sample-png-image-download-3.png",          
               iconSize:     [30, 30], // size of the icon

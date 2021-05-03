@@ -31,9 +31,24 @@ def test(request):
 	return JsonResponse({"Done": True})
 
 def get_next_departure(request, station, network):
+	res = []
 	if network == 'Star':
 		res = star.get_station_next_depart(station)
 	elif network == 'TCL':
 		res = tcl.get_station_next_depart(station)
 
 	return JsonResponse({"next_departures": res})
+
+def get_topo_station(request, station, network):
+	res = []
+	if network == 'Star':
+		res = star.get_topo(station)
+
+	return JsonResponse({"topo": res})
+
+def get_live_bus(request, station, network):
+	res = []
+	if network == "Star":
+		res = star.get_live_bus_station(station)
+
+	return JsonResponse({"live": res})
