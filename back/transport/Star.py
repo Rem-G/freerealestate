@@ -69,8 +69,8 @@ class Star:
 
 		if r.status_code == 200:
 			r.raw.decode_content = True
-			path = Path(settings.STATICFILES_DIRS[0]).parent.parent
-			with open(f"{path}/front/moov-front/static/img/{transport.get('fields').get('nomcourtligne')}.png", "wb") as f:
+			path = Path(settings.STATICFILES_DIRS[0])
+			with open(f"{path}/img/{transport.get('fields').get('nomcourtligne')}_{self.network}.png", "wb") as f:
 				shutil.copyfileobj(r.raw, f)
 			print('Image sucessfully Downloaded: ',img_id)
 		else:

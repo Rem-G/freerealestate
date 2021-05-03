@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import LineCard from "./lineCard"
+import LineCard from "./lineCard";
+import "../style/timeTablePanel.css";
 
 function TimeTablePanel({station}){
     const [lines, updateLines] = useState([])
@@ -9,7 +10,7 @@ function TimeTablePanel({station}){
 		axios
 		.get('http://127.0.0.1:8000/api/transport/nextdeparture/'+station.station)
         .then(response => {
-            lines.updateLines(response.line)
+            updateLines(response.data.next_departures)
         }
         )
 		.catch(err => {console.log(err);});
@@ -21,12 +22,14 @@ function TimeTablePanel({station}){
 
 	return (
 		<div className="panel">
-			<div className="panel-results">
-			{lines.map((line, index) =>(
-                <LineCard line/>
-				))
+			{lines.length > 0 &&
+			lines.map((line, index) => {
+				return (<LineCard line={line} station={station}/>)
+			})
 			}
-			</div>
+			{lines.length == 0 &&
+				<span className="empty">Pas de station selectionnée</span>
+			}
 		</div>
 		)
 }

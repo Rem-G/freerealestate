@@ -33,3 +33,6 @@ def test(request):
 def get_next_departure(request, station):
 	res = star.get_station_next_depart(station)
 	return JsonResponse({"next_departures": res})
+
+def get_image_request(request, line, network):
+	return JsonResponse({"ctx": get_image(line, network)})

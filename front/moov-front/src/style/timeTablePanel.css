@@ -1,3 +1,30 @@
 .panel {
-    
+    position: fixed;
+    width: 25%;
+    min-height: 50%;
+    max-height: 95%;
+    background: rgba(255, 255, 255, 0.50);
+    border-radius: 5px;
+    /* border: 1px solid; */
+    top: 50%;
+    right: 2%;
+    -webkit-transform: translate(0%, -50%);
+    z-index: 99;
+    overflow-y: auto;
+    box-shadow: 0 5px 10px rgba(140, 165, 185, .05), 0 5px 15px rgba(166, 173, 201, .1);
+    padding-bottom: 10px;
+}
+
+.empty {
+    position: fixed;
+    width: 80%;
+    background: white;
+    border-radius: 5px;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    font-size: medium;
+    box-shadow: 0 5px 5px rgba(70, 95, 185, .05), 0 5px 5px rgba(106, 123, 201, .2);
+    padding: 15px;
 }

@@ -1,0 +1,24 @@
+.container {
+    padding-bottom: 10px;
+}
+
+.result {
+    position: relative;
+    height: 7%;
+    width: 90%;
+    top: 10px;
+    left: 50%;
+    -webkit-transform: translate(-50%, 0%);
+    background: white;
+    border-radius: 5px;
+    /* border: 0.2px solid; */
+    padding: 5px;
+    font-size: 12px;
+    box-shadow: 0 5px 5px rgba(70, 95, 185, .05), 0 5px 5px rgba(106, 123, 201, .2);
+}
+
+.line {
+    font-style: bold;
+    padding-right: 15px;
+    padding: 2px;
+}

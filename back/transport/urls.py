@@ -9,4 +9,5 @@ urlpatterns = [
     re_path(r'createdb/', views.create_db, name='create_db'),
     re_path(r'test/', views.test),
     re_path(r'nextdeparture/(?P<station>[\w|\W]+)/', views.get_next_departure, name="get_next_departure"),
+    re_path(r'getimage/(?P<line>[\w|\W]+)/(?P<network>[\w|\W]+)/', views.get_image_request),
 ]
