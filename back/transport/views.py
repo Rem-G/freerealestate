@@ -22,7 +22,8 @@ def create_db(request):
 	return JsonResponse({"Done": True})
 
 def test(request):
-	ilevia.get_subway_data()
+	ilevia.get_info_at_bus_or_streetcar_stop("fort de mons")
+	ilevia.get_info_at_subway_stop("fort de mons")
 	return JsonResponse({"Done": True})
 	
 def get_next_departure(request, station):
