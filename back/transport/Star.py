@@ -75,7 +75,47 @@ class Star:
 		else:
 			print('Image Couldn\'t be retreived')
 		
+	def get_station_lines(self, station, transport_type="bus"):
+ 		url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-{transport_type}-topologie-dessertes-td&q=&facet=libellecourtparcours&facet=nomcourtligne&facet=nomarret&facet=estmonteeautorisee&facet=estdescenteautorisee&refine.nomarret={station}"
+ 		return set([line.get("fields").get("nomcourtligne") for line in request(url).get("records")])
 
+	def get_topo(self, station):
+		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000"
+		res = []
+		station_lines = self.get_station_lines(station)
+
+		for record in request(url).get("records"):
+			if record.get("fields").get("nomcourtligne") in station_lines:
+				res.append(record)
+
+		metro_url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000&refine.nomcourtligne=a"
+		res += request(metro_url).get("records")
+
+		return self.convert_coor_topo(res)
+
+	def convert_coor_topo(self, records):
+		for index, record in enumerate(records):
+			for coor_index, coor in enumerate(record.get("fields").get("parcours").get("coordinates")):
+				records[index]["fields"]["parcours"]["coordinates"][coor_index] = [coor[1], coor[0]]
+
+		return records
+
+	def convert_coor_live(self, records):
+		for index, record in enumerate(records):
+			coor = record["geometry"]["coordinates"]
+			records[index]["geometry"]["coordinates"] = [coor[1], coor[0]]
+
+		return records
+
+	def get_live_bus_station(self, station):
+		station_lines = self.get_station_lines(station)
+		res = []
+
+		for record in self.get_live_bus():
+			if record.get("fields").get("nomcourtligne") in station_lines:
+				res.append(record)		
+		return self.convert_coor_live(res)
+		 
 	def get_station_next_depart(self, station):
 		data = []
 		#bus

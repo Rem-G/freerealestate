@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, Tooltip } from 'react-leaflet'
 import L from 'leaflet';
 import axios from "axios";
 import 'leaflet/dist/leaflet.css';
@@ -59,7 +59,7 @@ export default function Map({station}){
           }
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png"
+          url='https://{s}.tile.jawg.io/jawg-light/{z}/{x}/{y}{r}.png?access-token=lSEGnNTOJVtlgrq2PsWaiy9iNmnRuwn2qtVunwPUuhBEPIiQo2pdfaHRIjukcPft'
         />
         {liveBus.length > 0 && 
           liveBus.map((bus, index) => {
@@ -80,7 +80,9 @@ export default function Map({station}){
           lines.map((line, index) => {
             const pathOptions = {color: line.fields.couleurtrace};
             return(
-              <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates} />
+              <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates} onMouseOver={e => e.target.openPopup()}>
+                <Tooltip><h2>Ligne {line.fields.nomcourtligne}</h2></Tooltip>
+              </Polyline>
             )
           })
         }

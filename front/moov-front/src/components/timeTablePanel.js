@@ -8,7 +8,7 @@ function TimeTablePanel({station}){
 
     const fetchResults = () => {
 		axios
-		.get('http://127.0.0.1:8000/api/transport/nextdeparture/'+station.station)
+		.get('http://127.0.0.1:8000/api/transport/nextdeparture/'+station.station+"/"+station.network)
         .then(response => {
             updateLines(response.data.next_departures)
         }
