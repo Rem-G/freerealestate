@@ -16,7 +16,7 @@ def get_station_infos(request, station):
 
 def create_db(request):
 	drop_table()
-	# tcl.create_station_db()
+	tcl.create_stations_db()
 	ilevia.create_stations_db()
 	star.create_stations_db()
 	return JsonResponse({"Done": True})
@@ -24,7 +24,11 @@ def create_db(request):
 def test(request):
 	ilevia.get_subway_data()
 	return JsonResponse({"Done": True})
-	
-def get_next_departure(request, station):
-	res = star.get_station_next_depart(station)
+
+def get_next_departure(request, station, network):
+	if network == 'Star':
+		res = star.get_station_next_depart(station)
+	elif network == 'TCL':
+		res = tcl.get_station_next_depart(station)
+
 	return JsonResponse({"next_departures": res})
