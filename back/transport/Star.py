@@ -38,10 +38,9 @@ class Star:
 		stations = []
 		stations = self.add_to_db(self.get_metro_stations(), stations)
 		stations = self.add_to_db(self.get_bus_stations(), stations)
-		self.download_img_all()
 	
 	def get_live_bus(self):
-		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-vehicules-geoposition-suivi-new-billetique-tr&q=&rows=10000"
+		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-vehicules-position-tr&q=&facet=numerobus&facet=nomcourtligne&facet=sens&facet=destination&rows=10000"
 		return request(url).get("records")
 
 	def download_img_all(self):

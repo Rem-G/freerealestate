@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import SearchBar from './searchbar';
 import Map from './map';
 import TimeTablePanel from './timeTablePanel';
@@ -6,12 +6,6 @@ import "../style/transport.css";
 import "../style/map.css";
 
 export default function Transport({station, updateStation, searchReq, updateSearchReq}){
-
-	React.useEffect(() => {
-
-	// eslint-disable-next-line
-	}, [searchReq], );
-
 	return(
 		<div >
 			<SearchBar station={station} updateStation={updateStation} searchReq={searchReq} updateSearchReq={updateSearchReq}/>

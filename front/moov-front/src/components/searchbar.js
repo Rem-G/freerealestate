@@ -22,7 +22,7 @@ function SearchBar({station, updateStation}){
 		.get('http://127.0.0.1:8000/api/transport/station/'+req_station+"/"+req_network)
 		.then(response => {
 			response.data.network.forEach(element => {
-				if (element.station == req_station) { updateStation(element); }
+				if (element.station === req_station) { updateStation(element); }
 			});
 		})
 		.catch(err => {console.log(err);});

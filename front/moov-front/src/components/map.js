@@ -15,7 +15,7 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 function ChangeView({center, zoom}) {
-    if (center == [48.864716, 2.349014]){ zoom = 7 }
+    if (center === [48.864716, 2.349014]){ zoom = 7 }
     const map = useMap();
     map.setView(center, zoom);
     return null;
@@ -23,23 +23,29 @@ function ChangeView({center, zoom}) {
 
 export default function Map({station}){
     const [liveBus, updateLiveBus] = useState([]);
+    const [lines, updateLines] = useState([]);
 
     const fetchStarLiveBus = () => {
       axios
-        .get("https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-vehicules-geoposition-suivi-new-billetique-tr&q=&rows=10000")
+        .get("http://localhost:8000/api/transport/livebus/"+station.station+"/"+station.network)
         .then(response => {
-          updateLiveBus(response.data.records);
+          updateLiveBus(response.data.live);
         })
         .catch(err => {console.log(err);});
     }
 
     const fetchStarLines = () => {
-      axios.get("")
+      axios.get("http://localhost:8000/api/transport/topo/"+station.station+"/"+station.network)
+      .then(response => {
+        updateLines(response.data.topo);
+        })
+      .catch(err => {console.log(err);});
     }
 
     useEffect(() => {
-      if (station.network == "Star"){
+      if (station.network === "Star"){
         // setInterval(() => {fetchLiveBus();}, 60000);
+        fetchStarLines();
         fetchStarLiveBus();
       }
     // eslint-disable-next-line
@@ -58,7 +64,7 @@ export default function Map({station}){
         {liveBus.length > 0 && 
           liveBus.map((bus, index) => {
             // const imgUrl = "../static/img/"+bus.fields.nomcourtligne+".png";
-            const position = [bus.geometry.coordinates[1], bus.geometry.coordinates[0]];
+            const position = bus.geometry.coordinates;
             const icon = new L.icon({
               iconUrl: "https://i.ya-webdesign.com/images/sample-png-image-download-3.png",          
               iconSize:     [30, 30], // size of the icon
@@ -68,6 +74,14 @@ export default function Map({station}){
             return (<Marker id={index} position={position} icon={icon} >
               <Popup>{bus.fields.nomcourtligne} destination {bus.fields.destination}</Popup>
             </Marker>)
+          })
+        }
+        {lines.length > 0 && 
+          lines.map((line, index) => {
+            const pathOptions = {color: line.fields.couleurtrace};
+            return(
+              <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates} />
+            )
           })
         }
       </MapContainer>
