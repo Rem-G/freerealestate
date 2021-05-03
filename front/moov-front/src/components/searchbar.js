@@ -16,10 +16,10 @@ function SearchBar({station, updateStation}){
 	  };
 
 	//replace with exact station, do not require to make forEach
-	const fetchStation = (req_station) => {
+	const fetchStation = (req_station, req_network) => {
 
 		axios
-		.get('http://127.0.0.1:8000/api/transport/station/'+req_station)
+		.get('http://127.0.0.1:8000/api/transport/station/'+req_station+"/"+req_network)
 		.then(response => {
 			response.data.network.forEach(element => {
 				if (element.station == req_station) { updateStation(element); }
@@ -30,10 +30,10 @@ function SearchBar({station, updateStation}){
 
 	const handleSubmit = event => {
 		const res = event.target.textContent.split(' - ');
-		res.pop();
+		const req_network = res.pop();
 		const req_station = res[0];
 		updateSuggestions([]);
-		fetchStation(req_station);
+		fetchStation(req_station, req_network);
 	};
 
 	return (

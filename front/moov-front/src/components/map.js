@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 import axios from "axios";
 import 'leaflet/dist/leaflet.css';
@@ -24,7 +24,7 @@ function ChangeView({center, zoom}) {
 export default function Map({station}){
     const [liveBus, updateLiveBus] = useState([]);
 
-    const fetchLiveBus = () => {
+    const fetchStarLiveBus = () => {
       axios
         .get("https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-vehicules-geoposition-suivi-new-billetique-tr&q=&rows=10000")
         .then(response => {
@@ -33,11 +33,17 @@ export default function Map({station}){
         .catch(err => {console.log(err);});
     }
 
+    const fetchStarLines = () => {
+      axios.get("")
+    }
+
     useEffect(() => {
       if (station.network == "Star"){
-        setInterval(() => {fetchLiveBus();}, 60000);
+        // setInterval(() => {fetchLiveBus();}, 60000);
+        fetchStarLiveBus();
       }
-    }, [station, liveBus]);
+    // eslint-disable-next-line
+    }, [station]);
 
     const position = [48.864716, 2.349014];
     return(
@@ -64,11 +70,6 @@ export default function Map({station}){
             </Marker>)
           })
         }
-        <Marker position={position}>
-          {/* <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup> */}
-        </Marker>
       </MapContainer>
     )
 

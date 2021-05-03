@@ -14,8 +14,8 @@ def find_station_suggestions(request, station):
 	res = get_station_suggestions(station)
 	return JsonResponse({"network": res})
 
-def get_station_infos(request, station):
-	res = get_station(station)
+def get_station_infos(request, station, network):
+	res = get_station(station, network)
 	return JsonResponse({"network": res})
 
 def create_db(request):

@@ -9,8 +9,8 @@ def get_station_suggestions(station):
 	else:
 		return []
 
-def get_station(station):
-	queryset = Station.objects.filter(station = station)
+def get_station(station, network):
+	queryset = Station.objects.filter(station = station, network = network)
 	data = list(queryset.values())
 	if len(data):
 		return data
