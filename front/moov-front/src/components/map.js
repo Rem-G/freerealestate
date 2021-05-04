@@ -1,10 +1,9 @@
 
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, Tooltip } from 'react-leaflet'
 import L from 'leaflet';
 import axios from "axios";
 import 'leaflet/dist/leaflet.css';
-
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -16,7 +15,7 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 function ChangeView({center, zoom}) {
-    if (center == [48.864716, 2.349014]){ zoom = 7 }
+    if (center === [48.864716, 2.349014]){ zoom = 7 }
     const map = useMap();
     map.setView(center, zoom);
     return null;
@@ -24,36 +23,32 @@ function ChangeView({center, zoom}) {
 
 export default function Map({station}){
     const [liveBus, updateLiveBus] = useState([]);
-    const [imgUrl, updateImgUrl] = useState("");
+    const [lines, updateLines] = useState([]);
 
-    const fetchLiveBus = () => {
+    const fetchStarLiveBus = () => {
       axios
-        .get("https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-vehicules-geoposition-suivi-new-billetique-tr&q=&rows=10000")
+        .get("http://localhost:8000/api/transport/livebus/"+station.station+"/"+station.network)
         .then(response => {
-          updateLiveBus(response.data.records);
+          updateLiveBus(response.data.live);
         })
         .catch(err => {console.log(err);});
     }
 
-    const getIconUrl = (bus) => {
-      let tempImgUrl = "";
-      axios
-        .get("https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-lignes-pictogrammes-dm&q=&facet=nomcourtligne&facet=date&facet=resolution&refine.nomcourtligne="+bus.fields.nomcourtligne)
-        .then(response => {
-          tempImgUrl = "https://data.explore.star.fr/explore/dataset/tco-bus-lignes-pictogrammes-dm/files/"+response.data.records[0].fields.image.id+"/22/";
-          tempImgUrl = "https://findicons.com/files/icons/2219/dot_pictograms/256/bus.png";
-          // console.log(imgUrl);
-          updateImgUrl(tempImgUrl);
+    const fetchStarLines = () => {
+      axios.get("http://localhost:8000/api/transport/topo/"+station.station+"/"+station.network)
+      .then(response => {
+        updateLines(response.data.topo);
         })
-        .catch(err => {console.log(err);});
-
-      return imgUrl;
+      .catch(err => {console.log(err);});
     }
 
     useEffect(() => {
-      if (station.network == "Star"){
-        fetchLiveBus();
+      if (station.network === "Star"){
+        // setInterval(() => {fetchLiveBus();}, 60000);
+        fetchStarLines();
+        fetchStarLiveBus();
       }
+    // eslint-disable-next-line
     }, [station]);
 
     const position = [48.864716, 2.349014];
@@ -64,30 +59,33 @@ export default function Map({station}){
           }
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png"
+          url='https://{s}.tile.jawg.io/jawg-light/{z}/{x}/{y}{r}.png?access-token=lSEGnNTOJVtlgrq2PsWaiy9iNmnRuwn2qtVunwPUuhBEPIiQo2pdfaHRIjukcPft'
         />
         {liveBus.length > 0 && 
           liveBus.map((bus, index) => {
-            getIconUrl(bus);
-            console.log(imgUrl);
-            return (<Marker id={index} position={[bus.geometry.coordinates[1], bus.geometry.coordinates[0]]} icon={
-              L.icon({
-              iconUrl: {imgUrl},
-              // shadowUrl: 'leaf-shadow.png',
-          
-              iconSize:     [38, 95], // size of the icon
-              shadowSize:   [50, 64], // size of the shadow
-              iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-              shadowAnchor: [4, 62],  // the same for the shadow
-              popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-          })} ></Marker>)
-        })
+            // const imgUrl = "../static/img/"+bus.fields.nomcourtligne+".png";
+            const position = bus.geometry.coordinates;
+            const icon = new L.icon({
+              iconUrl: "https://i.ya-webdesign.com/images/sample-png-image-download-3.png",          
+              iconSize:     [30, 30], // size of the icon
+              iconAnchor:   {position}, // point of the icon which will correspond to marker's location
+              // popupAnchor:  {position} // point from which the popup should open relative to the iconAnchor
+            });
+            return (<Marker id={index} position={position} icon={icon} >
+              <Popup>{bus.fields.nomcourtligne} destination {bus.fields.destination}</Popup>
+            </Marker>)
+          })
         }
-        <Marker position={position}>
-          {/* <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup> */}
-        </Marker>
+        {lines.length > 0 && 
+          lines.map((line, index) => {
+            const pathOptions = {color: line.fields.couleurtrace};
+            return(
+              <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates} onMouseOver={e => e.target.openPopup()}>
+                <Tooltip><h2>Ligne {line.fields.nomcourtligne}</h2></Tooltip>
+              </Polyline>
+            )
+          })
+        }
       </MapContainer>
     )
 

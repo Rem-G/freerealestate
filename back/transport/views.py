@@ -10,9 +10,13 @@ from .tools import *
 star = Star()
 tcl = TCL()
 ilevia = Ilevia()
-# rtm = RTM()
-def get_station_infos(request, station):
-	res = get_station_network(station)
+
+def find_station_suggestions(request, station):
+	res = get_station_suggestions(station)
+	return JsonResponse({"network": res})
+
+def get_station_infos(request, station, network):
+	res = get_station(station, network)
 	return JsonResponse({"network": res})
 
 def create_db(request):
@@ -24,10 +28,12 @@ def create_db(request):
 	return JsonResponse({"Done": True})
 
 def test(request):
-	ilevia.get_subway_data()
+	ilevia.get_info_at_bus_or_streetcar_stop("fort de mons")
+	ilevia.get_info_at_subway_stop("fort de mons")
 	return JsonResponse({"Done": True})
 
 def get_next_departure(request, station, network):
+	res = []
 	if network == 'Star':
 		res = star.get_station_next_depart(station)
 	elif network == 'TCL':
@@ -35,3 +41,20 @@ def get_next_departure(request, station, network):
 	# elif network == 'RTM':
 	# 	res = rtm.get_station_next_depart(station)
 	return JsonResponse({"next_departures": res})
+
+def get_image_request(request, line, network):
+	return JsonResponse({"ctx": get_image(line, network)})
+	
+def get_topo_station(request, station, network):
+	res = []
+	if network == 'Star':
+		res = star.get_topo(station)
+
+	return JsonResponse({"topo": res})
+
+def get_live_bus(request, station, network):
+	res = []
+	if network == "Star":
+		res = star.get_live_bus_station(station)
+
+	return JsonResponse({"live": res})

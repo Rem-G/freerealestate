@@ -1,8 +1,30 @@
 from .models import Station
 import requests
+import base64
+from django.conf import settings
+import shutil
+from pathlib import Path
 
-def get_station_network(station):
+def get_image(line, network):
+	ctx = dict()
+	static_path = Path(settings.STATICFILES_DIRS[0])
+	with open(f'{static_path}/img/{line}_{network}.png', "rb") as image_file:
+		image_data = base64.b64encode(image_file.read()).decode('utf-8')
+
+	ctx["image"] = image_data
+
+	return ctx
+
+def get_station_suggestions(station):
 	queryset = Station.objects.filter(station__contains = station)
+	data = list(queryset.values())
+	if len(data):
+		return data
+	else:
+		return []
+
+def get_station(station, network):
+	queryset = Station.objects.filter(station = station, network = network)
 	data = list(queryset.values())
 	if len(data):
 		return data
