@@ -6,7 +6,7 @@ import pandas as pd
 import os
 class TCL:
     def __init__(self) -> None:
-        self.network = "TCL"
+        self.network = "Lyon"
         self.static_path = settings.STATICFILES_DIRS[0]
         self.df = pd.read_parquet(f'{self.static_path}/gtfs_tcl/arrets.parquet.gzip')
         self.calendar =  pd.read_parquet(f'{self.static_path}/gtfs_tcl/calendar.parquet.gzip')
@@ -38,18 +38,62 @@ class TCL:
         data = []
         actuel = datetime.datetime.now().strftime('%H:%M:%S')
         semaine = {0: 'monday',1: 'tuesday',2: 'wednesday',3: 'thursday',4: 'friday',5:'saturday',6: 'sunday'}
-        jour = semaine[ datetime.datetime.today().weekday()]
-        stations = self.df[self.df["stop_name"] == station]
-        for sta in stations.index:
-            print(stations['stop_id'][sta])
-            print(jour)
-            heures = self.rechercheHeure(stations['stop_id'][sta], jour)
+        jour = semaine[datetime.datetime.today().weekday()]
+        try:
+            station = int(station)
+        except:
+            pass
+
+        if type(station) == str:
+            print("Re")
+            stations = self.df[self.df["stop_name"] == station]
+            for sta in stations.index:
+                heures = self.rechercheHeure(stations['stop_id'][sta], jour)
+                donnee = []
+                for i in heures:
+                    if len(donnee) > 5:
+                        break
+                    if(i > actuel):
+                        donnee.append(i)
+                data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departure": donnee})
+            return data
+
+        else:
+            stations = self.df[self.df["stop_id"] == station]
+            print(stations)
+            heures = self.rechercheHeure(int(stations['stop_id']), jour)
             donnee = []
             for i in heures:
                 if len(donnee) > 5:
                     break
                 if(i > actuel):
                     donnee.append(i)
-            data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departure": donnee})
+            data.append({"line": list(stations['short_name'])[0], "destination": list(stations['destination'])[0],"next_departure": donnee})
+            return data
 
-        return data
+
+
+    def tempsReel(self, stop_id):
+        url = "https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclpassagearret/all.json?maxfeatures=10000&start=1"
+        payload={}
+        headers = {'Authorization': 'Basic bG9pYy52aWV1QGV0dS51bml2LXNtYi5mcjpsb2xvbGlBOTw='}
+        boucle = True
+        while boucle:
+            response = requests.request("GET", url, headers=headers, data=payload)
+            newDf= pd.DataFrame.from_dict(response.json()['values'])
+            if len(newDf[newDf["id"] == stop_id]) == 0:
+                print(response.json().keys())
+                if('next' in response.json().keys()):
+                    url = response.json()['next']
+                else:
+                    boucle = False
+            else:
+                return list(newDf[newDf["id"] == stop_id]["heurepassage"])
+
+        # data = []
+        #     stations = self.df[self.df["stop_name"] == station]
+        #     for sta in stations.index:
+        #         donnee = self.tempsReel(stations['stop_id'][sta])
+        #         data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departure": donnee})
+
+        #     return data
