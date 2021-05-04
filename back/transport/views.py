@@ -4,12 +4,13 @@ from django.http import JsonResponse
 from .Star import Star
 from .TCL import TCL
 from .Ilevia import Ilevia
+from .RTM import RTM
 from .tools import *
 
 star = Star()
 tcl = TCL()
 ilevia = Ilevia()
-
+# rtm = RTM()
 def get_station_infos(request, station):
 	res = get_station_network(station)
 	return JsonResponse({"network": res})
@@ -19,6 +20,7 @@ def create_db(request):
 	tcl.create_stations_db()
 	ilevia.create_stations_db()
 	star.create_stations_db()
+	# rtm.create_stations_db()
 	return JsonResponse({"Done": True})
 
 def test(request):
@@ -30,5 +32,6 @@ def get_next_departure(request, station, network):
 		res = star.get_station_next_depart(station)
 	elif network == 'TCL':
 		res = tcl.get_station_next_depart(station)
-
+	# elif network == 'RTM':
+	# 	res = rtm.get_station_next_depart(station)
 	return JsonResponse({"next_departures": res})
