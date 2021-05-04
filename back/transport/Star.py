@@ -2,6 +2,7 @@ import requests
 from django.conf import settings
 import shutil
 from pathlib import Path
+import datetime
 from .tools import *
 
 #https://data.explore.star.fr/explore/?sort=title
@@ -115,36 +116,59 @@ class Star:
 			if record.get("fields").get("nomcourtligne") in station_lines:
 				res.append(record)		
 		return self.convert_coor_live(res)
+
+	
+	def check_dt(self, dt):
+		dt_obj = datetime.datetime.strptime(dt.split('+')[0], '%Y-%m-%dT%H:%M:%S')
+		now = datetime.datetime.now() + datetime.timedelta(hours = int(dt.split("+")[1].split(":")[0]))
+		if dt_obj > now:
+			return True
+		return False
+
+	def convert_dt_string(self, dt):
+		dt_obj = datetime.datetime.strptime(dt.split('+')[0], '%Y-%m-%dT%H:%M:%S')
+		return f"{dt_obj.hour}:{dt_obj.minute}"
+
 		 
 	def get_station_next_depart(self, station):
-		data = []
+		data = {}
 		#bus
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-dessertes-td&q=&sort=idparcours&facet=libellecourtparcours&facet=nomcourtligne&facet=nomarret&facet=estmonteeautorisee&facet=estdescenteautorisee&refine.nomarret={}".format(station)
 		station_lines = request(url).get("records")
 
 		#metro
-		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-topologie-dessertes-td&q=&facet=libellecourtparcours&facet=nomcourtligne&facet=nomarret&facet=estmonteeautorisee&facet=estdescenteautorisee&refine.nomarret={}".format(station)
+		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-circulation-passages-tr&q=&facet=nomcourtligne&facet=sens&facet=destination&facet=nomarret&facet=precision&timezone=Europe/Paris&refine.nomarret={}".format(station)
 		station_lines += request(url).get("records")
+		
 		id_lines = set([line.get("fields").get("idligne") for line in station_lines])
 
 		for id_line in id_lines:
 			if id_line == "1001":#metro
-				url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-circulation-passages-tr&q=&sort=-depart&facet=nomcourtligne&facet=sens&facet=destination&facet=nomarret&facet=precision&facet=idligne&refine.idligne={}&rows=5&timezone=Europe/Paris".format(id_line)
+				url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-circulation-passages-tr&q=&sort=-depart&facet=nomcourtligne&facet=sens&facet=destination&facet=nomarret&facet=precision&facet=idligne&refine.idligne={}&refine.nomarret={}&rows=60&timezone=Europe/Paris".format(id_line, station)
 			else:
-				url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-circulation-passages-tr&q=&sort=-depart&facet=idligne&facet=nomcourtligne&facet=sens&facet=destination&facet=precision&facet=nomarret&refine.idligne={}&rows=5&timezone=Europe/Paris".format(id_line)
+				url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-circulation-passages-tr&q=&sort=-depart&facet=idligne&facet=nomcourtligne&facet=sens&facet=destination&facet=precision&facet=nomarret&refine.idligne={}&refine.nomarret={}&rows=40&timezone=Europe/Paris".format(id_line, station)
 			
 			line_infos = request(url).get("records")
-			destinations = []
-			lines = []
 
 			for rec in line_infos:
 				dest = rec.get("fields").get("destination")
 				line = rec.get("fields").get("nomcourtligne")
 
-				if not(dest in destinations and line in lines):
-					data.append({"line": line, "destination": dest, "next_departure": rec.get("fields").get("depart")})
-					destinations.append(dest)
-					lines.append(line)
+				if line not in data.keys():
+					data[line] = {}
+				
+				if dest not in data[line].keys():
+					data[line][dest] = {}
+
+				if not data[line][dest].get("next_departures"):
+					data[line][dest]["next_departures"] = []
+				
+				depart_var = "departtheorique"
+				if line == 'a':
+					depart_var = "depart"
+
+				if self.check_dt(rec.get("fields").get(depart_var)) and len(data[line][dest]["next_departures"]) < 3:
+					data[line][dest]["next_departures"].append(self.convert_dt_string(rec.get("fields").get(depart_var)))
 					
 		return data
 
