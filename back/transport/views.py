@@ -34,9 +34,9 @@ def test(request):
 
 def get_next_departure(request, station, network):
 	res = []
-	if network == 'Star':
+	if network == 'Rennes':
 		res = star.get_station_next_depart(station)
-	elif network == 'TCL':
+	elif network == 'Lyon':
 		res = tcl.get_station_next_depart(station)
 	# elif network == 'RTM':
 	# 	res = rtm.get_station_next_depart(station)
@@ -47,14 +47,14 @@ def get_image_request(request, line, network):
 	
 def get_topo_station(request, station, network):
 	res = []
-	if network == 'Star':
+	if network == 'Rennes':
 		res = star.get_topo(station)
 
 	return JsonResponse({"topo": res})
 
 def get_live_bus(request, station, network):
 	res = []
-	if network == "Star":
+	if network == "Rennes":
 		res = star.get_live_bus_station(station)
 
 	return JsonResponse({"live": res})

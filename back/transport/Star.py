@@ -11,6 +11,7 @@ class Star:
 	def __init__(self):
 		self.network = "Star"
 		self.city = "Rennes"
+
 	def get_bus_stations(self):
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-pointsarret-td&q=&facet=nomstationparente&rows=10000"
 		res = request(url)
@@ -30,7 +31,7 @@ class Star:
 			name = station.get("fields").get("nom")
 			if name not in stations:
 				lat, lon = station.get("geometry").get("coordinates")
-				add_station_db(name, self.city, lat, lon)
+				add_station_db(name, self.city, lon, lat)
 				stations.append(name)
 		return stations
 
@@ -70,7 +71,7 @@ class Star:
 		if r.status_code == 200:
 			r.raw.decode_content = True
 			path = Path(settings.STATICFILES_DIRS[0])
-			with open(f"{path}/img/{transport.get('fields').get('nomcourtligne')}_{self.network}.png", "wb") as f:
+			with open(f"{path}/img/{transport.get('fields').get('nomcourtligne')}_{self.city}.png", "wb") as f:
 				shutil.copyfileobj(r.raw, f)
 			print('Image sucessfully Downloaded: ',img_id)
 		else:
