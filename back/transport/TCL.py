@@ -13,8 +13,11 @@ class TCL:
         self.trips =  pd.read_parquet(f'{self.static_path}/gtfs_tcl/trips.parquet.gzip')
 
     def create_stations_db(self):
-        for i in self.df.index:
-            add_station_db(station = self.df["stop_name"][i], network=self.network, lat=self.df["lat"][i], lon=self.df["lon"][i], id_station=self.df["stop_id"][i])
+        newDf = self.df.loc[:, 'stop_name'].drop_duplicates()
+        for i in newDf.index:
+            lat = self.df[self.df["stop_name"] == newDf[i]]['lat'].values[0]
+            lon = self.df[self.df["stop_name"] == newDf[i]]['lon'].values[0]
+            add_station_db(station = newDf[i], network= self.network, lat=lat, lon=lon)
 
     def rechercheService(self,stop_id, jour):
         heure = []

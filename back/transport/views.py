@@ -44,7 +44,7 @@ def get_next_departure(request, station, network):
 
 def get_image_request(request, line, network):
 	return JsonResponse({"ctx": get_image(line, network)})
-	
+
 def get_topo_station(request, station, network):
 	res = []
 	if network == 'Rennes':
