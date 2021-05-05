@@ -30,8 +30,8 @@ class Star:
 		for station in data:
 			name = station.get("fields").get("nom")
 			if name not in stations:
-				lat, lon = station.get("geometry").get("coordinates")
-				add_station_db(name, self.city, lon, lat)
+				lon, lat = station.get("geometry").get("coordinates")
+				add_station_db(station = name, network = self.city, lat = lat, lon = lon)
 				stations.append(name)
 		return stations
 
@@ -40,22 +40,27 @@ class Star:
 		stations = []
 		stations = self.add_to_db(self.get_metro_stations(), stations)
 		stations = self.add_to_db(self.get_bus_stations(), stations)
+		self.download_img_all()
 	
 	def get_live_bus(self):
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-vehicules-position-tr&q=&facet=numerobus&facet=nomcourtligne&facet=sens&facet=destination&rows=10000"
 		return request(url).get("records")
 
+	def get_bus_lines(self):
+		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-lignes-td&q=&facet=nomfamillecommerciale&rows=10000"
+		return request(url).get("records")
+
 	def download_img_all(self):
-		for transport in self.get_live_bus():
+		for transport in self.get_bus_lines():
 			self.download_img(transport)
 
-		self.download_img({"fields": {"nomcourtligne": "a"}}, "metro")
+		self.download_img({"fields": {"nomcourt": "a"}}, "metro")
 
 	def download_img(self, transport, transport_type="bus"):
 		if transport_type == "bus":
-			url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-lignes-pictogrammes-dm&q=&facet=nomcourtligne&facet=date&facet=resolution&refine.nomcourtligne={transport.get('fields').get('nomcourtligne')}"
+			url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-lignes-pictogrammes-dm&q=&facet=nomcourtligne&facet=date&facet=resolution&refine.nomcourtligne={transport.get('fields').get('nomcourt')}"
 		else:
-			url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-lignes-pictogrammes-dm&q=&facet=nomcourtligne&facet=date&facet=resolution&refine.nomcourtligne={transport.get('fields').get('nomcourtligne')}"
+			url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-lignes-pictogrammes-dm&q=&facet=nomcourtligne&facet=date&facet=resolution&refine.nomcourtligne={transport.get('fields').get('nomcourt')}"
 		img_id = ""
 		for img in request(url).get("records"):
 			if img.get('fields').get('image').get("width") == 100:
@@ -71,7 +76,7 @@ class Star:
 		if r.status_code == 200:
 			r.raw.decode_content = True
 			path = Path(settings.STATICFILES_DIRS[0])
-			with open(f"{path}/img/{transport.get('fields').get('nomcourtligne')}_{self.city}.png", "wb") as f:
+			with open(f"{path}/img/{transport.get('fields').get('nomcourt')}_{self.city}.png", "wb") as f:
 				shutil.copyfileobj(r.raw, f)
 			print('Image sucessfully Downloaded: ',img_id)
 		else:
