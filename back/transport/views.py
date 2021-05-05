@@ -59,7 +59,8 @@ def get_live_bus(request, station, network):
 
 	return JsonResponse({"live": res})
 
-def get_alertes_trafic(request, station):
+def get_alertes_trafic(request, network, station, type_a):
 	res = []
-	res = tcl.get_alertes_trafic(station)
+	if network == "Lyon":
+		res = tcl.get_alertes_trafic(station, type_a)
 	return JsonResponse({"alert": res})
