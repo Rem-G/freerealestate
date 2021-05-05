@@ -14,7 +14,7 @@ class TCL:
 
     def create_stations_db(self):
         for i in self.df.index:
-            add_station_db(self.df["stop_name"][i], self.network, self.df["lat"][i], self.df["lon"][i])
+            add_station_db(self.df["stop_name"][i], self.network, self.df["lat"][i], self.df["lon"][i], self.df["stop_id"][i])
 
     def rechercheService(self,stop_id, jour):
         heure = []
@@ -45,7 +45,6 @@ class TCL:
             pass
 
         if type(station) == str:
-            print("Re")
             stations = self.df[self.df["stop_name"] == station]
             for sta in stations.index:
                 heures = self.rechercheHeure(stations['stop_id'][sta], jour)
@@ -60,7 +59,6 @@ class TCL:
 
         else:
             stations = self.df[self.df["stop_id"] == station]
-            print(stations)
             heures = self.rechercheHeure(int(stations['stop_id']), jour)
             donnee = []
             for i in heures:
@@ -71,29 +69,33 @@ class TCL:
             data.append({"line": list(stations['short_name'])[0], "destination": list(stations['destination'])[0],"next_departure": donnee})
             return data
 
+    def get_alertes_trafic(self, id_station):
+        try:
+            id_station = int(id_station)
+        except:
+            pass
 
-
-    def tempsReel(self, stop_id):
-        url = "https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclpassagearret/all.json?maxfeatures=10000&start=1"
+        url = "https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclalertetrafic_2/all.json?maxfeatures=-1&start=1"
         payload={}
         headers = {'Authorization': 'Basic bG9pYy52aWV1QGV0dS51bml2LXNtYi5mcjpsb2xvbGlBOTw='}
-        boucle = True
-        while boucle:
-            response = requests.request("GET", url, headers=headers, data=payload)
-            newDf= pd.DataFrame.from_dict(response.json()['values'])
-            if len(newDf[newDf["id"] == stop_id]) == 0:
-                print(response.json().keys())
-                if('next' in response.json().keys()):
-                    url = response.json()['next']
-                else:
-                    boucle = False
-            else:
-                return list(newDf[newDf["id"] == stop_id]["heurepassage"])
+        response = requests.request("GET", url, headers=headers, data=payload)
+        trafic_alertes = response.json()['values']
+        ar = []
+        # =======================================
+        if type(id_station) == int:
+            short_n = self.df[self.df["stop_id"] == id_station]["short_name"].values[0].upper()
+            for alerte in trafic_alertes:
+                if alerte['ligne_cli'].upper() == short_n:
+                    ar.append(alerte)
+            return ar
 
-        # data = []
-        #     stations = self.df[self.df["stop_name"] == station]
-        #     for sta in stations.index:
-        #         donnee = self.tempsReel(stations['stop_id'][sta])
-        #         data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departure": donnee})
-
-        #     return data
+        # =======================================
+        else:
+            stations = self.df[self.df["stop_name"] == id_station]
+            for station in stations.index:
+                # print(station)
+                ligne = stations["short_name"][station]
+                for alerte in trafic_alertes:
+                    if alerte['ligne_cli'].upper() == ligne.upper():
+                        ar.append(alerte)
+            return ar

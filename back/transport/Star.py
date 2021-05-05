@@ -10,7 +10,7 @@ from .tools import *
 class Star:
 	def __init__(self):
 		self.network = "Star"
-
+		self.city = "Rennes"
 	def get_bus_stations(self):
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-pointsarret-td&q=&facet=nomstationparente&rows=10000"
 		res = request(url)
@@ -30,7 +30,7 @@ class Star:
 			name = station.get("fields").get("nom")
 			if name not in stations:
 				lat, lon = station.get("geometry").get("coordinates")
-				add_station_db(name, self.network, lat, lon)
+				add_station_db(name, self.city, lat, lon)
 				stations.append(name)
 		return stations
 

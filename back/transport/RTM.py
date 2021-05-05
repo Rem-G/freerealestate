@@ -6,7 +6,7 @@ import pandas as pd
 import os
 class RTM:
     def __init__(self) -> None:
-        self.network = "RTM"
+        self.network = "Marseille"
         self.static_path = settings.STATICFILES_DIRS[0]
         self.df = pd.read_parquet(f'{self.static_path}/gtfs_rtm/arrets.parquet.gzip')
         self.calendar =  pd.read_parquet(f'{self.static_path}/gtfs_rtm/calendar.parquet.gzip')

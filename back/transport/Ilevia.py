@@ -11,6 +11,7 @@ class Ilevia:
 
     def __init__(self):
         self.network = "Ilevia"
+        self.city = "Lille"
         self.static_path = settings.STATICFILES_DIRS[0]
         print(self.static_path+"/gtfs_Ilevia/stops.txt")
 
@@ -33,13 +34,13 @@ class Ilevia:
 
     def create_stations_db(self):
         for metro_station in self.get_subway_stops():
-            add_station_db(metro_station, self.network)
+            add_station_db(metro_station, self.city)
 
         for bus_station in self.get_bus_stops():
-            add_station_db(bus_station, self.network)
+            add_station_db(bus_station, self.city)
 
         for streetcar_station in self.get_streetcar_stops():
-            add_station_db(streetcar_station, self.network)
+            add_station_db(streetcar_station, self.city)
 
 
     def get_info_at_bus_or_streetcar_stop(self, stop):

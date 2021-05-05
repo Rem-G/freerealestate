@@ -58,3 +58,8 @@ def get_live_bus(request, station, network):
 		res = star.get_live_bus_station(station)
 
 	return JsonResponse({"live": res})
+
+def get_alertes_trafic(request, station):
+	res = []
+	res = tcl.get_alertes_trafic(station)
+	return JsonResponse({"alert": res})
