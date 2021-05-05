@@ -10,7 +10,8 @@ function TimeTablePanel({station}){
 		axios
 		.get('http://127.0.0.1:8000/api/transport/nextdeparture/'+station.station+"/"+station.network)
         .then(response => {
-            updateLines(response.data.next_departures)
+            updateLines(response.data.next_departures);
+			console.log(response.data.next_departures);
         }
         )
 		.catch(err => {console.log(err);});
@@ -18,15 +19,19 @@ function TimeTablePanel({station}){
 
 	useEffect(() => {
 		fetchResults()
-	  }, [station]);
+		console.log(lines);
+	}, [station]);
 
 	return (
 		<div className="panel">
 			{lines.length > 0 &&
-			lines.map((line, index) => {
-				return (<LineCard line={line} station={station}/>)
-			})
-			}
+			Object.keys(lines).forEach((line) => {
+				console.log(line);
+				Object.keys(lines.line).forEach((dest) => {
+					console.log(dest);
+					return (<LineCard line={line} station={station}/>)
+				})
+			})}
 			{lines.length == 0 &&
 				<span className="empty">Pas de station selectionnée</span>
 			}

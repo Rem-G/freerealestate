@@ -125,11 +125,27 @@ class Star:
 			return True
 		return False
 
+	def add_0_to_dt(self, dt):
+		for key, value in dt.items():
+			if len(str(value)) == 1:
+				dt[key] = "0"+str(value)
+		return dt
+
 	def convert_dt_string(self, dt):
 		dt_obj = datetime.datetime.strptime(dt.split('+')[0], '%Y-%m-%dT%H:%M:%S')
-		return f"{dt_obj.hour}:{dt_obj.minute}"
+		dt_obj_str = self.add_0_to_dt({"hour": dt_obj.hour, "min": dt_obj.minute})
 
-		 
+		return f"{dt_obj_str['hour']}:{dt_obj_str['min']}"
+
+	def format_next_departures(self, records):
+		data = []
+
+		for line, line_value in records.items():
+			for dest, dest_value in line_value.items():
+				data.append({"line": line, "destination": dest, "next_departures": dest_value.get("next_departures")})
+
+		return data
+
 	def get_station_next_depart(self, station):
 		data = {}
 		#bus
@@ -170,8 +186,4 @@ class Star:
 				if self.check_dt(rec.get("fields").get(depart_var)) and len(data[line][dest]["next_departures"]) < 3:
 					data[line][dest]["next_departures"].append(self.convert_dt_string(rec.get("fields").get(depart_var)))
 					
-		return data
-
-
-
-
+		return self.format_next_departures(data)

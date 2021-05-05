@@ -19,18 +19,26 @@ function LineCard({line, station}){
 		fetchResults();
 	}, [line, station])
 
-	// const LineImage = ({ data }) => <img src={`data:image/jpeg;base64,${data}`} />
+	///////////////////////////////////////
+	// PENSER A METTRE A JOUR LES IMAGES //
+	///////////////////////////////////////
 
 	return (
 		<div className="container">
 			<div className="result">
 				<img style={{height:"30px", width:"30px"}}src={image}/>
-				<span className="direction">{line.destination}</span>
-				<div className="horaires">
-					<span>{line.next_departure}</span>
-					{/* <h4>{line.next_departure.get(1)}</h4>
-					<h4>{line.next_departure.get(2)}</h4> */}
-				</div>
+				{line.map((dest, index) => {
+					console.log(dest);
+					return (
+					<>
+					<span className="direction">{dest}</span>
+					<div className="horaires">
+						<span>{dest.next_departures[0]}</span>
+						<span>{dest.next_departures[1]}</span>
+						<span>{dest.next_departures[2]}</span>
+					</div>
+					</>)
+				})}
 			</div>
 		</div>
 		)
