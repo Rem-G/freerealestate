@@ -14,8 +14,9 @@
     height: 20px;
     padding: 10px;
     border-radius: 5px;
-    border-color: #2f3640;
-    border: 1px solid;
+    /* border-color: #2f3640; */
+    /* border: 1px solid; */
+    box-shadow: 0 5px 10px rgba(140, 165, 185, .05), 0 5px 15px rgba(166, 173, 201, .1);
 
     grid-column: 1;
     grid-row: 1;

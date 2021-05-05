@@ -2,6 +2,7 @@ import React from 'react';
 import SearchBar from './searchbar';
 import Map from './map';
 import TimeTablePanel from './timeTablePanel';
+import MapLegend from './mapLegend';
 import "../style/transport.css";
 import "../style/map.css";
 
@@ -13,8 +14,9 @@ export default function Transport({station, updateStation, searchReq, updateSear
 				<Map station={station}/>
 			</div>
 			<div classname="side panel">
-				<TimeTablePanel station={station}/>
+				{/* <TimeTablePanel station={station}/> */}
 			</div>
+			<MapLegend/>
 		</div>
 	);
 };

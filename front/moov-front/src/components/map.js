@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, Tooltip } from 'react-leaflet'
 import L from 'leaflet';
 import axios from "axios";
+import BusPopup from "./busPopup.js";
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -43,7 +44,7 @@ export default function Map({station}){
     }
 
     useEffect(() => {
-      if (station.network === "Star"){
+      if (station.network === "Rennes"){
         // setInterval(() => {fetchLiveBus();}, 60000);
         fetchStarLines();
         fetchStarLiveBus();
@@ -51,11 +52,16 @@ export default function Map({station}){
     // eslint-disable-next-line
     }, [station]);
 
+    const getCurrentLatLon = (e) => {
+      console.log("ok");
+      console.log(e);
+    }
+
     const position = [48.864716, 2.349014];
     return(
       <MapContainer center={position} zoom={7} scrollWheelZoom={false} style={{ height: "100%", width: "auto" }}>
           {station &&
-            <ChangeView center={[station.lon, station.lat]} zoom={19}/>
+            <ChangeView center={[station.lat, station.lon]} zoom={19}/>
           }
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -72,7 +78,7 @@ export default function Map({station}){
               // popupAnchor:  {position} // point from which the popup should open relative to the iconAnchor
             });
             return (<Marker id={index} position={position} icon={icon} >
-              <Popup>{bus.fields.nomcourtligne} destination {bus.fields.destination}</Popup>
+              <BusPopup bus={bus} station={station}></BusPopup>
             </Marker>)
           })
         }
@@ -80,8 +86,8 @@ export default function Map({station}){
           lines.map((line, index) => {
             const pathOptions = {color: line.fields.couleurtrace};
             return(
-              <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates} onMouseOver={e => e.target.openPopup()}>
-                <Tooltip><h2>Ligne {line.fields.nomcourtligne}</h2></Tooltip>
+              <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates}>
+                <Tooltip onMouseOver={e => getCurrentLatLon(e)}><h2>Ligne {line.fields.nomcourtligne}</h2></Tooltip>
               </Polyline>
             )
           })
