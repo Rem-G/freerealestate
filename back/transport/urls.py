@@ -11,4 +11,5 @@ urlpatterns = [
     re_path(r'nextdeparture/(?P<station>[\w|\W]+)/(?P<network>[\w|\W]+)/', views.get_next_departure, name="get_next_departure"),
     re_path(r'topo/(?P<station>[\w|\W]+)/(?P<network>[\w|\W]+)/', views.get_topo_station, name="get_topo_station"),
     re_path(r'livebus/(?P<station>[\w|\W]+)/(?P<network>[\w|\W]+)/', views.get_live_bus, name="get_live_bus"),
+    re_path(r'alert/(?P<station>[\w|\W]+)/', views.get_alertes_trafic, name="get_alertes_trafic"),
 ]
