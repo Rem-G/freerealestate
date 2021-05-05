@@ -14,7 +14,7 @@ class TCL:
 
     def create_stations_db(self):
         for i in self.df.index:
-            add_station_db(self.df["stop_name"][i], self.network, self.df["lat"][i], self.df["lon"][i], self.df["stop_id"][i])
+            add_station_db(station = self.df["stop_name"][i], network=self.network, lat=self.df["lat"][i], lon=self.df["lon"][i], id_station=self.df["stop_id"][i])
 
     def rechercheService(self,stop_id, jour):
         heure = []
@@ -69,11 +69,7 @@ class TCL:
             data.append({"line": list(stations['short_name'])[0], "destination": list(stations['destination'])[0],"next_departure": donnee})
             return data
 
-    def get_alertes_trafic(self, id_station):
-        try:
-            id_station = int(id_station)
-        except:
-            pass
+    def get_alertes_trafic(self, id_station, type_a):
 
         url = "https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclalertetrafic_2/all.json?maxfeatures=-1&start=1"
         payload={}
@@ -82,15 +78,17 @@ class TCL:
         trafic_alertes = response.json()['values']
         ar = []
         # =======================================
-        if type(id_station) == int:
+        if type_a == "0":
+            id_station = int(id_station)
             short_n = self.df[self.df["stop_id"] == id_station]["short_name"].values[0].upper()
+            print(short_n)
             for alerte in trafic_alertes:
                 if alerte['ligne_cli'].upper() == short_n:
                     ar.append(alerte)
             return ar
 
         # =======================================
-        else:
+        elif type_a == "1":
             stations = self.df[self.df["stop_name"] == id_station]
             for station in stations.index:
                 # print(station)
@@ -98,4 +96,10 @@ class TCL:
                 for alerte in trafic_alertes:
                     if alerte['ligne_cli'].upper() == ligne.upper():
                         ar.append(alerte)
+            return ar
+
+        elif type_a == "2":
+            for alerte in trafic_alertes:
+                if alerte['type'] == 'Perturbation majeure':
+                    ar.append(alerte)
             return ar
