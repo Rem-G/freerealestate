@@ -18,6 +18,7 @@ export default function BusPopup({bus, station}){
 
 	useEffect(() => {
 		fetchResults();
+        console.log(bus);
 	}, [station]);
 
 

@@ -1,11 +1,11 @@
 .legend-card{
-    position: fixed;
+    position: absolute;
     bottom: 5%;
     left: 5%;
     padding: 10px;
     background: rgba(255, 255, 255, 0.50);
     box-shadow: 0 5px 10px rgba(140, 165, 185, .05), 0 5px 15px rgba(166, 173, 201, .1);
-    z-index: 2;
+    z-index: 3;
     background: red;
     width:200px;
     height: 100px;
