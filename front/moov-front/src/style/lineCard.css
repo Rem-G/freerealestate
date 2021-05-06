@@ -2,15 +2,13 @@
     position: relative;
     display: grid;
     grid-template-columns: 10% 30% 45%;
-    grid-gap: 10px;
     max-width: 97%;
     padding: 10px;
-    top: 10px;
     background: white;
     border-radius: 5px;
     box-shadow: 0 5px 5px rgba(70, 95, 185, .05), 0 5px 5px rgba(106, 123, 201, .2);
-    margin: auto;
     overflow-x: hidden;
+    border-top: 1px solid #e9e9e9;
 }
 
 .one{
