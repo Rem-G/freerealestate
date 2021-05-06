@@ -111,7 +111,7 @@ class TCL:
             ar['BUS'] = []
             ar['METRO'] = []
             for alerte in trafic_alertes:
-                if alerte['type'] == 'Perturbation majeure' and alerte['ligne_cli'] not in ligne:
+                if (alerte['type'] == 'Perturbation majeure' or alerte['mode'] == 'Métro')and alerte['ligne_cli'] not in ligne:
                     type_t = list(self.df[self.df['short_name'] == alerte['ligne_cli']]['type'])
                     if (len(type_t) > 0):
                         type_t = type_t[0]
@@ -142,7 +142,13 @@ class TCL:
                     conver = i['fields']['couleur'].split(' ')
                     new['fields']['couleurtrace']  = '#%02x%02x%02x' % (int(conver[0]), int(conver[1]), int(conver[2]))
                     new['fields']['parcours'] = {}
-                    new['fields']['parcours']['coordinates'] = i['fields']['geo_shape']['coordinates']
+                    coo = []
+                    for j in i['fields']['geo_shape']['coordinates']:
+                        coo.append([j[1],j[0]])
+                        # for u in j:
+                        #     coo2.append([u[1], u[0]])
+                        # coo.append(coo2)
+                    new['fields']['parcours']['coordinates'] = coo
                     new['fields']['nomcourtLigne'] = i['fields']['ligne']
                     res.append(new)
             return res
