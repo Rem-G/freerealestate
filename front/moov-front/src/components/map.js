@@ -44,7 +44,7 @@ export default function Map({station}){
     }
 
     useEffect(() => {
-      if (station.network === "Rennes"){
+      if (station.network === "Rennes" || station.network === "Lyon"){
         // setInterval(() => {fetchLiveBus();}, 60000);
         fetchStarLines();
         fetchStarLiveBus();
@@ -84,6 +84,7 @@ export default function Map({station}){
         }
         {lines.length > 0 && 
           lines.map((line, index) => {
+            console.log(line)
             const pathOptions = {color: line.fields.couleurtrace};
             return(
               <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates}>

@@ -20,7 +20,6 @@ class TCL:
             lon = self.df[self.df["stop_name"] == newDf[i]]['lon'].values[0]
             add_station_db(station = newDf[i], network= self.network, lat=lat, lon=lon)
 
-    # --------- Rercherche du prochain départ 
     def rechercheService(self,stop_id, jour):
         heure = []
         id_route = list(self.df[self.df['stop_id'] == stop_id]['id_route'])[0]
@@ -104,34 +103,60 @@ class TCL:
                         ar.append(alerte)
             return ar
 
+        # =======================================
         elif type_a == "2":
+            ligne = []
+            ar = {}
+            ar['TRAM'] = []
+            ar['BUS'] = []
+            ar['METRO'] = []
             for alerte in trafic_alertes:
-                if alerte['type'] == 'Perturbation majeure':
-                    ar.append(alerte)
+                if alerte['type'] == 'Perturbation majeure' and alerte['ligne_cli'] not in ligne:
+                    type_t = list(self.df[self.df['short_name'] == alerte['ligne_cli']]['type'])
+                    if (len(type_t) > 0):
+                        type_t = type_t[0]
+                        if type_t == 'FUNICULAIRE':
+                            type_t = "METRO"
+                        if type_t == 'BUS' or type_t == 'TRAM' or type_t == "METRO":
+                            ar[type_t].append(alerte)
+                            ligne.append(alerte['ligne_cli'])
             return ar
+
+
+
+
+
+
 
     def get_topo_req(self):
         self.topo['METRO'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-metro-et-funiculaire-du-reseau-tcl-grand-lyon&q=&rows=10000&facet=geo_point_2d&facet=code_titan&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1").json()['records']
-        self.topo['BUS'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-bus-du-reseau-tcl-grand-lyon&q=&rows=100000&facet=sens&facet=infos&facet=couleur&facet=last_upd_1").json()['records']
+        self.topo['BUS'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-bus-du-reseau-tcl-grand-lyon&q=&rows=10000&facet=sens&facet=infos&facet=couleur&facet=last_upd_1").json()['records']
         self.topo['TRAM'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-tramway-du-reseau-tcl-grand-lyon&q=&rows=10000&facet=geo_point_2d&facet=code_titan&facet=ligne&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1").json()['records']
 
     def get_topo(self, station):
         res = []
-        def recherche(dict_c, nom):
-            res = []
+        def recherche(dict_c, nom, res):
             for i in dict_c:
                 if i['fields']['ligne'] == nom:
-                    res.append(i)
+                    new = {'fields': {}}
+                    conver = i['fields']['couleur'].split(' ')
+                    new['fields']['couleurtrace']  = '#%02x%02x%02x' % (int(conver[0]), int(conver[1]), int(conver[2]))
+                    new['fields']['parcours'] = {}
+                    new['fields']['parcours']['coordinates'] = i['fields']['geo_shape']['coordinates']
+                    new['fields']['nomcourtLigne'] = i['fields']['ligne']
+                    res.append(new)
             return res
 
-
-        if self.topo == {}:
+        if self.topo == {}: 
             self.get_topo_req()
 
         df_stations = self.df[self.df['stop_name'] == station]
         for station in df_stations.index:
             type_t = df_stations['type'][station]
+            print(type_t)
+            if type_t == "FUNICULAIRE":
+                type_t = "METRO"
             nam_s = df_stations['short_name'][station]
-            res.append(recherche(self.topo[type_t], nam_s))
+            recherche(self.topo[type_t], nam_s,res)
 
         return res

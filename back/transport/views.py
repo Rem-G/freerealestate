@@ -50,7 +50,7 @@ def get_topo_station(request, station, network):
 	if network == 'Rennes':
 		res = star.get_topo(station)
 	if network == 'Lyon':
-		res = star.get_topo(station)
+		res = tcl.get_topo(station)
 
 	return JsonResponse({"topo": res})
 

@@ -1,0 +1,57 @@
+.alert_panel {
+    position: fixed;
+    width: 5%;
+    min-height: 50%;
+    max-height: 95%;
+    top: 1%;
+    right: 80%;
+    z-index: 99;
+    overflow-y: auto;
+    padding-bottom: 10px;
+}
+
+.pop_up {
+    position: fixed;
+    width: 60%;
+    background: white;
+    border-radius: 5px;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    font-size: medium;
+    box-shadow: 0 5px 5px rgba(70, 95, 185, .05), 0 5px 5px rgba(106, 123, 201, .2);
+    padding: 15px;
+    max-height: 50%;
+    overflow-y: auto;
+
+}
+
+.button {
+    z-index: 50;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(45deg, #0c0c0c, #838181);
+    border-radius: 20px;
+    color: #FFF;
+    font-size: 20px;
+    letter-spacing: 1px;
+    font-weight: 200;
+  }
+
+  .card_div {
+    float:left;
+    padding: 2px;
+  }
+
+  .metro_tram_bus{
+      padding: 3.85%;
+  }
+
+  .back{
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/3/33/For%C3%AAt_am%C3%A9rique_du_sud.jpg");
+  }
