@@ -47,7 +47,7 @@ export default function Map({station}){
     }
 
     useEffect(() => {
-      if (station.network === "Rennes"){
+      if (station.network === "Rennes" || station.network === "Lyon"){
         // setInterval(() => {fetchLiveBus();}, 60000);
         fetchStarLines();
         fetchStarLiveBus();
@@ -99,7 +99,7 @@ export default function Map({station}){
             }
           </MapContainer>
         </div>
-        <MapLegend lines={lines}/>
+        <MapLegend lines={lines} network={station.network}/>
       </div>
     )
 }

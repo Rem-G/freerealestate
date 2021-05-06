@@ -18,7 +18,6 @@ def get_image(line, network):
 def get_station_suggestions(station):
 	queryset = Station.objects.filter(station__contains = station)
 	data = list(queryset.values())
-	print(data)
 	if len(data):
 		return data
 	else:
