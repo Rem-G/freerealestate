@@ -8,7 +8,7 @@ export default function MapLegend({lines, station}) {
     useEffect(() => {
         updateLegendLines([]);
     }, [station]);
-    
+
     useEffect(() => {
         filterLegend();
     }, [lines]);
@@ -27,7 +27,7 @@ export default function MapLegend({lines, station}) {
 
     return (
         <div className="legend-card">
-            <p style={{fontSize: " .83em", fontWeight: "bolder", paddingBottom: "10px"}} >Lignes</p>
+            <p style={{fontSize: " .83em", fontWeight: "bolder", paddingBottom: "10px", textAlign: "center"}} >Lignes</p>
             {legendLines.map((line) =>
                 <div className="legend-card-row">
                     <div className="legend-card-column" style={{width: "30px"}}>
