@@ -4,12 +4,19 @@ import base64
 from django.conf import settings
 import shutil
 from pathlib import Path
+import os.path
 
 def get_image(line, network):
 	ctx = dict()
 	static_path = Path(settings.STATICFILES_DIRS[0])
-	with open(f'{static_path}/img/{line}_{network}.png', "rb") as image_file:
-		image_data = base64.b64encode(image_file.read()).decode('utf-8')
+
+	if os.path.isfile(f'{static_path}/img/{line}_{network}.png'):
+		with open(f'{static_path}/img/{line}_{network}.png', "rb") as image_file:
+			image_data = base64.b64encode(image_file.read()).decode('utf-8')
+
+	else:
+		with open(f'{static_path}/img/notfound.png', "rb") as image_file:
+			image_data = base64.b64encode(image_file.read()).decode('utf-8')
 
 	ctx["image"] = image_data
 

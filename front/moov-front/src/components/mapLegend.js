@@ -2,9 +2,13 @@ import React, { useEffect, useState} from "react";
 import "../style/maplegend.css"
 import TransportImage from "./transportImage";
 
-export default function MapLegend({lines, network}) {
+export default function MapLegend({lines, station}) {
     const [legendLines, updateLegendLines] = useState([]);
 
+    useEffect(() => {
+        updateLegendLines([]);
+    }, [station]);
+    
     useEffect(() => {
         filterLegend();
     }, [lines]);
@@ -23,11 +27,11 @@ export default function MapLegend({lines, network}) {
 
     return (
         <div className="legend-card">
-            <p style={{fontSize: " .83em", fontWeight: "bolder", paddingBottom: "10px"}} >Légende</p>
+            <p style={{fontSize: " .83em", fontWeight: "bolder", paddingBottom: "10px"}} >Lignes</p>
             {legendLines.map((line) =>
                 <div className="legend-card-row">
                     <div className="legend-card-column" style={{width: "30px"}}>
-                        <TransportImage transport={line.fields.nomcourtligne} network={network}></TransportImage>
+                        <TransportImage transport={line.fields.nomcourtligne} network={station.network}></TransportImage>
                     </div>
                     <div className="legend-card-column" style={{background: line.fields.couleurtrace, width:"15px", height:"4px", top:"50%"}}></div>
                 </div>

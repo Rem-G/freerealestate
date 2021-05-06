@@ -25,7 +25,7 @@ function ChangeView({center, zoom}) {
     return null;
   } 
 
-export default function Map({station}){
+export default function Map({station, searchReq}){
     const [liveBus, updateLiveBus] = useState([]);
     const [lines, updateLines] = useState([]);
 
@@ -54,11 +54,6 @@ export default function Map({station}){
       }
     // eslint-disable-next-line
     }, [station]);
-
-    const getCurrentLatLon = (e) => {
-      console.log("ok");
-      console.log(e);
-    }
 
     const position = [48.864716, 2.349014];
     return(
@@ -91,15 +86,13 @@ export default function Map({station}){
               lines.map((line, index) => {
                 const pathOptions = {color: line.fields.couleurtrace};
                 return(
-                  <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates}>
-                    <Tooltip onMouseOver={e => getCurrentLatLon(e)}><h2>Ligne {line.fields.nomcourtligne}</h2></Tooltip>
-                  </Polyline>
+                  <Polyline id={index} pathOptions={pathOptions} positions={line.fields.parcours.coordinates} />
                 )
               })
             }
           </MapContainer>
         </div>
-        <MapLegend lines={lines} network={station.network}/>
+        <MapLegend lines={lines} station={station}/>
       </div>
     )
 }

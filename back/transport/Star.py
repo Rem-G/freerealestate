@@ -66,21 +66,22 @@ class Star:
 			if img.get('fields').get('image').get("width") == 100:
 				img_id = img.get('fields').get('image').get('id')
 
-		if transport_type == "bus":
-			line_img_url_dl = f"https://data.explore.star.fr/explore/dataset/tco-bus-lignes-pictogrammes-dm/files/{img_id}/download/"
-		else:
-			line_img_url_dl = f"https://data.explore.star.fr/explore/dataset/tco-metro-lignes-pictogrammes-dm/files/{img_id}/download/"
+		if len(img_id) > 0:
+			if transport_type == "bus":
+				line_img_url_dl = f"https://data.explore.star.fr/explore/dataset/tco-bus-lignes-pictogrammes-dm/files/{img_id}/download/"
+			else:
+				line_img_url_dl = f"https://data.explore.star.fr/explore/dataset/tco-metro-lignes-pictogrammes-dm/files/{img_id}/download/"
 
-		r = requests.get(line_img_url_dl, stream = True)
+			r = requests.get(line_img_url_dl, stream = True)
 
-		if r.status_code == 200:
-			r.raw.decode_content = True
-			path = Path(settings.STATICFILES_DIRS[0])
-			with open(f"{path}/img/{transport.get('fields').get('nomcourt')}_{self.city}.png", "wb") as f:
-				shutil.copyfileobj(r.raw, f)
-			print('Image sucessfully Downloaded: ',img_id)
-		else:
-			print('Image Couldn\'t be retreived')
+			if r.status_code == 200:
+				r.raw.decode_content = True
+				path = Path(settings.STATICFILES_DIRS[0])
+				with open(f"{path}/img/{transport.get('fields').get('nomcourt')}_{self.city}.png", "wb") as f:
+					shutil.copyfileobj(r.raw, f)
+				print('Image sucessfully Downloaded: ',img_id)
+			else:
+				print('Image Couldn\'t be retreived')
 		
 	def get_station_lines(self, station, transport_type="bus"):
  		url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-{transport_type}-topologie-dessertes-td&q=&facet=libellecourtparcours&facet=nomcourtligne&facet=nomarret&facet=estmonteeautorisee&facet=estdescenteautorisee&refine.nomarret={station}"
@@ -90,7 +91,7 @@ class Star:
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000"
 		res = []
 		station_lines = self.get_station_lines(station)
-		current_lines = self.get_station_lines_names(station)
+		current_lines = [rec.get("line") for rec in self.get_station_next_depart(station)]
 
 		for record in request(url).get("records"):
 			if record.get("fields").get("nomcourtligne") in station_lines and record.get("fields").get("nomcourtligne") in current_lines:
