@@ -3,7 +3,8 @@ import "../style/lineCard.css";
 import axios from 'axios';
 
 function LineCard({line, station}){
-    const [image, updateImage] = useState([])
+    const [image, updateImage] = useState([]);
+
 
     const fetchResults = () => {
 		axios
@@ -19,26 +20,22 @@ function LineCard({line, station}){
 		fetchResults();
 	}, [line, station])
 
-	///////////////////////////////////////
-	// PENSER A METTRE A JOUR LES IMAGES //
-	///////////////////////////////////////
-
 	return (
-		<div className="container">
-			<div className="result">
-				<img style={{height:"30px", width:"30px"}}src={image}/>
-				{line.map((dest, index) => {
-					console.log(dest);
-					return (
-					<>
-					<span className="direction">{dest}</span>
-					<div className="horaires">
-						<span>{dest.next_departures[0]}</span>
-						<span>{dest.next_departures[1]}</span>
-						<span>{dest.next_departures[2]}</span>
-					</div>
-					</>)
-				})}
+		<div className="result-text-wrapper">
+			<div className="one">
+				{image.length > 0 &&
+					<img style={{height:"30px", width:"30px", top:"50%", webkitTransform: "translate(0%, 50%)"}} src={image}/>
+				}
+			</div>
+			<div className="two">
+				<span className="direction">{line.destination}</span>
+			</div>
+			<div className="three">
+				<ul className="horaires">
+					<li className="premierHoraire">{line.next_departures[0]}</li>
+					<li className="deuxiemeHoraire">{line.next_departures[1]}</li>
+					<li className="troisiemeHoraire">{line.next_departures[2]}</li>
+				</ul>
 			</div>
 		</div>
 		)

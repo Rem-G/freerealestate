@@ -1,29 +1,62 @@
-.container {
-    padding-bottom: 10px;
-}
-
-.result {
+.result-text-wrapper {
     position: relative;
-    height: 7%;
-    width: 90%;
+    display: grid;
+    grid-template-columns: 10% 30% 45%;
+    grid-gap: 10px;
+    max-width: 97%;
+    padding: 10px;
     top: 10px;
-    left: 50%;
-    -webkit-transform: translate(-50%, 0%);
     background: white;
     border-radius: 5px;
-    /* border: 0.2px solid; */
-    padding: 5px;
-    font-size: 12px;
     box-shadow: 0 5px 5px rgba(70, 95, 185, .05), 0 5px 5px rgba(106, 123, 201, .2);
+    margin: auto;
+    overflow-x: hidden;
 }
 
+.one{
+    grid-column: 1 / 3;
+    grid-row: 1;
+ }
+
+ .two{
+    grid-column: 2 / 3;
+    grid-row: 1;
+    margin: auto;
+    padding-left: 3px;
+ }
+
+ .three {
+    grid-column: 3 / 3;
+    grid-row: 1;
+    margin: auto;
+ }
+
 .direction {
-    height: 100%;
-    font-style: bold;
-    font-size: 20px;
-    padding-left: 15px;
-    top: 50%;
-    left: 15px;
-    -webkit-transform: translate(0%, -50%);
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    font-size: 17px;
     text-align: center;
+}
+
+.horaires {
+    display: flex;
+    flex-direction: line;
+    list-style: none;
+}
+
+.premierHoraire {
+    font-size: 20px;
+    padding-right: 7px;
+}
+
+.deuxiemeHoraire {
+    font-size: 17px;
+    color: rgba(0, 0, 0, 0.65);
+    padding-right: 7px;
+}
+
+.troisiemeHoraire {
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.65);
 }
