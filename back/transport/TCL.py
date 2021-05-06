@@ -103,11 +103,30 @@ class TCL:
                         ar.append(alerte)
             return ar
 
+        # =======================================
         elif type_a == "2":
+            ligne = []
+            ar = {}
+            ar['TRAM'] = []
+            ar['BUS'] = []
+            ar['METRO'] = []
             for alerte in trafic_alertes:
-                if alerte['type'] == 'Perturbation majeure':
-                    ar.append(alerte)
+                if alerte['type'] == 'Perturbation majeure' and alerte['ligne_cli'] not in ligne:
+                    type_t = list(self.df[self.df['short_name'] == alerte['ligne_cli']]['type'])
+                    if (len(type_t) > 0):
+                        type_t = type_t[0]
+                        if type_t == 'FUNICULAIRE':
+                            type_t = "METRO"
+                        if type_t == 'BUS' or type_t == 'TRAM' or type_t == "METRO":
+                            ar[type_t].append(alerte)
+                            ligne.append(alerte['ligne_cli'])
             return ar
+
+
+
+
+
+
 
     def get_topo_req(self):
         self.topo['METRO'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-metro-et-funiculaire-du-reseau-tcl-grand-lyon&q=&rows=10000&facet=geo_point_2d&facet=code_titan&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1").json()['records']
@@ -116,19 +135,12 @@ class TCL:
 
     def get_topo(self, station):
         res = []
-        def convert_coor_topo(records):
-            for index, record in enumerate(records):
-                for coor_index, coor in enumerate(record.get("fields").get("parcours").get("coordinates")):
-                    records[index]["fields"]["parcours"]["coordinates"][coor_index] = [coor[1], coor[0]]
-            return records
-
         def recherche(dict_c, nom, res):
             for i in dict_c:
                 if i['fields']['ligne'] == nom:
                     new = {'fields': {}}
                     conver = i['fields']['couleur'].split(' ')
-                    conver = '#%02x%02x%02x' % (int(conver[0]), int(conver[1]), int(conver[2]))
-                    new['fields']['couleurtrace'] = conver
+                    new['fields']['couleurtrace']  = '#%02x%02x%02x' % (int(conver[0]), int(conver[1]), int(conver[2]))
                     new['fields']['parcours'] = {}
                     new['fields']['parcours']['coordinates'] = i['fields']['geo_shape']['coordinates']
                     new['fields']['nomcourtLigne'] = i['fields']['ligne']
