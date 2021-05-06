@@ -8,10 +8,9 @@ function TimeTablePanel({station}){
 
     async function fetchResults() {
 		axios
-		.get('http://localhost:8000/api/transport/nextdeparture/'+station.station+"/"+station.network)
+		.get('http://localhost:8000/api/transport/nextdepartures/'+station.station+"/"+station.network)
         .then(response => {
             updateLines(response.data.next_departures);
-			console.log(response.data.next_departures);
         }
         )
 		.catch(err => {console.log(err);});
@@ -19,7 +18,6 @@ function TimeTablePanel({station}){
 
 	useEffect(() => {
 		fetchResults();
-		console.log(lines);
 	}, [station]);
 
 	return (
