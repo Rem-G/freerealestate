@@ -14,9 +14,9 @@ export default function Transport({station, updateStation, searchReq, updateSear
 				<Map station={station}/>
 			</div>
 			<div classname="side panel">
-				{/* <TimeTablePanel station={station}/> */}
+				<TimeTablePanel station={station}/>
 			</div>
-			<MapLegend/>
+			{/* <MapLegend/> */}
 		</div>
 	);
 };
