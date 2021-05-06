@@ -90,9 +90,10 @@ class Star:
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000"
 		res = []
 		station_lines = self.get_station_lines(station)
+		current_lines = self.get_station_lines_names(station)
 
 		for record in request(url).get("records"):
-			if record.get("fields").get("nomcourtligne") in station_lines:
+			if record.get("fields").get("nomcourtligne") in station_lines and record.get("fields").get("nomcourtligne") in current_lines:
 				res.append(record)
 
 		metro_url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000&refine.nomcourtligne=a"
@@ -152,6 +153,16 @@ class Star:
 
 		return data
 
+	def get_station_lines_names(self, station):
+		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-dessertes-td&q=&sort=idparcours&facet=libellecourtparcours&facet=nomcourtligne&facet=nomarret&facet=estmonteeautorisee&facet=estdescenteautorisee&refine.nomarret={}".format(station)
+		station_lines = request(url).get("records")
+
+		#metro
+		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-circulation-passages-tr&q=&facet=nomcourtligne&facet=sens&facet=destination&facet=nomarret&facet=precision&timezone=Europe/Paris&refine.nomarret={}".format(station)
+		station_lines += request(url).get("records")
+		
+		return set([line.get("fields").get("nomcourtligne") for line in station_lines])
+
 	def get_station_next_depart(self, station):
 		data = {}
 		#bus
@@ -191,5 +202,5 @@ class Star:
 
 				if self.check_dt(rec.get("fields").get(depart_var)) and len(data[line][dest]["next_departures"]) < 3:
 					data[line][dest]["next_departures"].append(self.convert_dt_string(rec.get("fields").get(depart_var)))
-					
+
 		return self.format_next_departures(data)

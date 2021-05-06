@@ -32,7 +32,7 @@ def test(request):
 	ilevia.get_info_at_subway_stop("fort de mons")
 	return JsonResponse({"Done": True})
 
-def get_next_departure(request, station, network):
+def get_next_departures(request, station, network):
 	res = []
 	if network == 'Rennes':
 		res = star.get_station_next_depart(station)
@@ -49,7 +49,7 @@ def get_topo_station(request, station, network):
 	res = []
 	if network == 'Rennes':
 		res = star.get_topo(station)
-	if network == 'Lyon':
+	elif network == 'Lyon':
 		res = tcl.get_topo(station)
 
 	return JsonResponse({"topo": res})

@@ -36,8 +36,9 @@ export default function Alert ({station}) {
     <Popup trigger={<WarningIcon style={{ fontSize: 40 }}></WarningIcon>} position="center">
     <div className = "pop_up">
         <h2>Information résaux</h2>
-        <div className= "metro_tram_bus">
+
         {/* Visualisaton des Metro */}
+        <div className= "metro_tram_bus">
         <h3 className = "back">Alerte Metro</h3>
         {alertes.METRO.length > 0 ?
         alertes.METRO.map(alerte =>
@@ -48,8 +49,11 @@ export default function Alert ({station}) {
         :
         "Aucune alerte réseaux"
         }
+        </div>
+
 
         {/* Visualisaton des TRAM */}
+        <div className= "metro_tram_bus">
         <h3 className = "back" >Alerte TRAM</h3>
         {alertes.TRAM.length > 0 ?
         alertes.TRAM.map(alerte =>
@@ -60,9 +64,10 @@ export default function Alert ({station}) {
         :
         "Aucune alerte réseaux"
         }
-
+        </div>
 
         {/* Visualisaton des BUS */}
+        <div className= "metro_tram_bus">
         <h3 className = "back">Alerte BUS</h3>
         {alertes.BUS.length > 0 ?
         alertes.BUS.map(alerte =>
@@ -73,7 +78,6 @@ export default function Alert ({station}) {
         :
         "Aucune alerte réseaux"
         }
-
 
         </div>
     </div>
