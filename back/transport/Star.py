@@ -3,6 +3,7 @@ from django.conf import settings
 import shutil
 from pathlib import Path
 import datetime
+from dateutil import tz
 from .tools import *
 
 #https://data.explore.star.fr/explore/?sort=title
@@ -205,3 +206,57 @@ class Star:
 					data[line][dest]["next_departures"].append(self.convert_dt_string(rec.get("fields").get(depart_var)))
 
 		return self.format_next_departures(data)
+
+
+	def get_line_frequentation(self, line):
+		if line == "a":
+			line = "Ligne a"
+
+		weekday = datetime.datetime.today().weekday()
+
+		day_string = "Lundi-vendredi"
+		if weekday == 5:
+			day_string = "Samedi"
+		elif weekday == 6:
+			day_string = "Dimanche"
+
+		url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=mkt-frequentation-niveau-freq-max-ligne&q=&sort=tranche_horaire&facet=materiel&facet=jour_semaine&facet=ligne&facet=tranche_horaire&facet=frequentation&facet=niveau_frequentation&refine.ligne={line}&refine.jour_semaine={day_string}&rows=100"
+		res = request(url).get("records")
+
+		return self.format_line_frequentation(res)
+
+
+	def format_line_frequentation(self, records):
+		labels = []
+		values = []
+
+		for rec in records:
+			if rec.get("fields").get("niveau_frequentation"):
+				labels.append(rec.get("fields").get("tranche_horaire"))
+				values.append(rec.get("fields").get("niveau_frequentation"))
+
+		current_tz = tz.gettz("Europe/Paris")
+		utc_now = datetime.datetime.now()
+		now = utc_now.astimezone(current_tz).replace(tzinfo=None)
+
+		current_index = len(labels)-1
+
+		for label_index, label in enumerate(labels):
+			label_dt = datetime.datetime.strptime(f'{now.day}/{now.month}/{now.year} {label}', '%d/%m/%Y %H:%M')
+
+			if label_index < len(labels)-1:
+				next_label_dt = datetime.datetime.strptime(f"{now.month}/{now.day}/{now.year} {labels[label_index+1]}", '%d/%m/%Y %H:%M')
+				if now >= label_dt and now < next_label_dt:
+					current_index = label_index
+
+			if label_index % 4 != 0 and label_index > 0:
+				labels[label_index] = ""
+			
+		labels[current_index] = "Now"
+
+		return ({"labels": labels, "values": values, "current_index": current_index})
+
+
+
+
+
