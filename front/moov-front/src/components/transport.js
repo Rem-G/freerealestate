@@ -2,7 +2,6 @@ import React from 'react';
 import SearchBar from './searchbar';
 import Map from './map';
 import TimeTablePanel from './timeTablePanel';
-import MapLegend from './mapLegend';
 import Alert from './alert'
 import "../style/transport.css";
 
