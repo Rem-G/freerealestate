@@ -28,11 +28,11 @@ const FreqChart = ({station, line}) => {
 		.catch(err => {console.log(err);});
 	};
 
-    const datasetKeyProvider=()=>{ 
+    const datasetKeyProvider=()=>{
         return btoa(Math.random()).substring(0,12)
     }
 
-    const ticksLabels = ["Faible", "Moyenne", "Haute"];
+    const ticksLabels = ["", "Faible", "Moyenne", "Haute"];
 
     const options = {
         responsive: true,
@@ -56,10 +56,12 @@ const FreqChart = ({station, line}) => {
                     display: false,
                 },
                 ticks: {
+                  // scaleShowValues: true,
+                  autoSkip: false,
                     display: true,
                     beginAtZero: true,
                     callback: function(value, index, values) {
-                        return  ticksLabels[value];
+                        return ticksLabels[value];
                     }
                 },
             },

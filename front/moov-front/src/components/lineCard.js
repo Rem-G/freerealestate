@@ -53,6 +53,7 @@ function LineCard({line, station}){
 			{statPanel && 
 					<div className="statPanel">
 						<div className="premiereStat">
+							<h5>Fréquentation de la ligne</h5>
 							<FreqChart station={station} line={line.line} />
 						</div>
 					</div>

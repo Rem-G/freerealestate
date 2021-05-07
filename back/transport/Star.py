@@ -254,7 +254,7 @@ class Star:
 		for rec in records:
 			if rec.get("fields").get("niveau_frequentation"):
 				labels.append(rec.get("fields").get("tranche_horaire"))
-				values.append(rec.get("fields").get("niveau_frequentation")-1)
+				values.append(rec.get("fields").get("niveau_frequentation"))
 
 		current_tz = tz.gettz("Europe/Paris")
 		utc_now = datetime.datetime.now()
@@ -275,4 +275,4 @@ class Star:
 			
 		labels[current_index] = "Now"
 
-		return ({"labels": labels, "values": values, "current_index": current_index})
+		return ({"labels": labels, "values": values, "current_index": current_index,})
