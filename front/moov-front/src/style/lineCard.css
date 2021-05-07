@@ -35,6 +35,7 @@
     justify-items: center;
     font-size: 17px;
     text-align: center;
+    color: rgba(0, 0, 0, 0.8);
 }
 
 .gif {
@@ -51,17 +52,23 @@
 }
 
 .premierHoraire {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 20px;
     padding-right: 7px;
 }
 
 .deuxiemeHoraire {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 17px;
     color: rgba(0, 0, 0, 0.65);
     padding-right: 7px;
 }
 
 .troisiemeHoraire {
+<<<<<<< HEAD
+=======
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+>>>>>>> 49ac0c0a6e620ca3cd80cd78b945f276bd1711f0
     font-size: 14px;
     color: rgba(0, 0, 0, 0.65);
 }
@@ -74,7 +81,6 @@
 }
 
 .premiereStat{
-    font-size: 50px;
     padding: 10px;
     border-radius: 5px;
     background-color: white;
@@ -82,5 +88,6 @@
     text-align: center;
     margin: 5px;
     width: 100%;
-    height: 200px;
+    overflow-y: hidden;
+    height: 220px;
 }
