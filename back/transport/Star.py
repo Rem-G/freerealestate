@@ -276,8 +276,3 @@ class Star:
 		labels[current_index] = "Now"
 
 		return ({"labels": labels, "values": values, "current_index": current_index})
-
-
-
-
-

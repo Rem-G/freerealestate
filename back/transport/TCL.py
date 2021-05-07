@@ -4,6 +4,10 @@ from django.conf import settings
 import datetime
 import pandas as pd
 import os
+import shutil
+from svglib.svglib import svg2rlg
+from reportlab.graphics import renderPM
+
 class TCL:
     def __init__(self) -> None:
         self.network = "Lyon"
@@ -13,8 +17,10 @@ class TCL:
         self.trips =  pd.read_parquet(f'{self.static_path}/gtfs_tcl/trips.parquet.gzip')
         self.topo = {}
 
+
     def create_stations_db(self):
         newDf = self.df.loc[:, 'stop_name'].drop_duplicates()
+        self.download_img_all()
         for i in newDf.index:
             lat = self.df[self.df["stop_name"] == newDf[i]]['lat'].values[0]
             lon = self.df[self.df["stop_name"] == newDf[i]]['lon'].values[0]
@@ -37,7 +43,6 @@ class TCL:
         data = pd.read_parquet(f'{self.static_path}/gtfs_tcl/{type_transport}/{stop_id}.parquet.gzip')
         return sorted(data[data['trip_id'].isin(ensembleTrips)]['departure_time'])
 
-
     def get_station_next_depart(self, station):
         data = []
         actuel = datetime.datetime.now().strftime('%H:%M:%S')
@@ -58,7 +63,7 @@ class TCL:
                         break
                     if(i > actuel):
                         donnee.append(i)
-                data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departure": donnee})
+                data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departures": donnee})
             return data
 
         else:
@@ -70,7 +75,7 @@ class TCL:
                     break
                 if(i > actuel):
                     donnee.append(i)
-            data.append({"line": list(stations['short_name'])[0], "destination": list(stations['destination'])[0],"next_departure": donnee})
+            data.append({"line": list(stations['short_name'])[0], "destination": list(stations['destination'])[0],"next_departures": donnee})
             return data
 
     # allert sur le résaux
@@ -121,12 +126,6 @@ class TCL:
                             ligne.append(alerte['ligne_cli'])
             return ar
 
-
-
-
-
-
-
     def get_topo_req(self):
         self.topo['METRO'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-metro-et-funiculaire-du-reseau-tcl-grand-lyon&q=&rows=10000&facet=geo_point_2d&facet=code_titan&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1").json()['records']
         self.topo['BUS'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-bus-du-reseau-tcl-grand-lyon&q=&rows=10000&facet=sens&facet=infos&facet=couleur&facet=last_upd_1").json()['records']
@@ -164,3 +163,26 @@ class TCL:
             recherche(self.topo[type_t], nam_s,res)
 
         return res
+
+
+
+
+
+
+    def download_img_all(self):
+        path = Path(settings.STATICFILES_DIRS[0])
+        lignes = self.df['short_name'].drop_duplicates().values
+        for ligne in lignes:
+            try:
+                image = requests.get(f"https://www.tcl.fr/themes/custom/sytral_theme/img/lignes/{ligne}.svg",  stream = True)
+                if image.status_code == 200:
+                    image.raw.decode_content = True
+                    lieux = f"{path}/img/{ligne}_Lyon"
+                    with open(f"{lieux}.svg", "wb") as f:
+                        shutil.copyfileobj(image.raw, f)
+
+                    drawing = svg2rlg(f'{lieux}.svg')
+                    renderPM.drawToFile(drawing, f'{lieux}.png', fmt='PNG')
+                    os.remove(f'{lieux}.svg')
+            except:
+                print('Image fail')
