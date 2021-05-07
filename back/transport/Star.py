@@ -129,7 +129,10 @@ class Star:
 	
 	def check_dt(self, dt):
 		dt_obj = datetime.datetime.strptime(dt.split('+')[0], '%Y-%m-%dT%H:%M:%S')
-		now = datetime.datetime.now() + datetime.timedelta(hours = int(dt.split("+")[1].split(":")[0]))
+		current_tz = tz.gettz("Europe/Paris")
+		utc_now = datetime.datetime.now()
+		now = utc_now.astimezone(current_tz).replace(tzinfo=None)
+
 		if dt_obj > now:
 			return True
 		return False
@@ -186,16 +189,14 @@ class Star:
 			line_infos = request(url).get("records")
 
 			for rec in line_infos:
-				dest = rec.get("fields").get("destination")
 				line = rec.get("fields").get("nomcourtligne")
+				dest = rec.get("fields").get("destination")
 
-				if line not in data.keys():
+				if not line in data.keys():
 					data[line] = {}
-				
-				if dest not in data[line].keys():
-					data[line][dest] = {}
 
-				if not data[line][dest].get("next_departures"):
+				if not dest in data[line].keys():
+					data[line][dest] = {}
 					data[line][dest]["next_departures"] = []
 				
 				depart_var = "departtheorique"
@@ -207,6 +208,27 @@ class Star:
 
 		return self.format_next_departures(data)
 
+
+	def get_alertes_trafic(self, id_station, type_a):
+		alertes = requests.get('https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-busmetro-trafic-alertes-tr&q=&rows=10000&facet=niveau&facet=debutvalidite&facet=finvalidite&facet=idligne&facet=nomcourtligne').json()['records']
+		res = {}
+		res['BUS'] = []
+		res['METRO'] = []
+		res['TRAM'] = []
+		station_lines = self.get_station_lines(id_station)
+		for alerte in alertes:
+			if alerte['fields']['niveau'] == "Majeure":
+				a = {}
+				a['ligne_cli'] = alerte["fields"]['nomcourtligne']
+				a['debut'] = alerte["fields"]['debutvalidite']
+				a['titre'] = alerte["fields"]['titre']
+				a['message'] = alerte["fields"]['description']
+				if alerte["fields"]['nomcourtligne'] == "A":
+					res['METRO'].append(a)
+				else:
+					res['BUS'].append(a)
+
+		return res 
 
 	def get_line_frequentation(self, line):
 		if line == "a":
@@ -225,7 +247,6 @@ class Star:
 
 		return self.format_line_frequentation(res)
 
-
 	def format_line_frequentation(self, records):
 		labels = []
 		values = []
@@ -233,7 +254,7 @@ class Star:
 		for rec in records:
 			if rec.get("fields").get("niveau_frequentation"):
 				labels.append(rec.get("fields").get("tranche_horaire"))
-				values.append(rec.get("fields").get("niveau_frequentation"))
+				values.append(rec.get("fields").get("niveau_frequentation")-1)
 
 		current_tz = tz.gettz("Europe/Paris")
 		utc_now = datetime.datetime.now()
@@ -249,7 +270,7 @@ class Star:
 				if now >= label_dt and now < next_label_dt:
 					current_index = label_index
 
-			if label_index % 4 != 0 and label_index > 0:
+			if label_index % 5 != 0 and label_index > 0:
 				labels[label_index] = ""
 			
 		labels[current_index] = "Now"
