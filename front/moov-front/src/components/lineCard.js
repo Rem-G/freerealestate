@@ -4,6 +4,7 @@ import axios from 'axios';
 
 function LineCard({line, station}){
     const [image, updateImage] = useState([]);
+	const [statPanel, updateStatPanel] = useState(false);
 
 
     const fetchResults = () => {
@@ -22,7 +23,7 @@ function LineCard({line, station}){
 
 	return (
 		<>
-			<div className="result-text-wrapper">
+			<div className="result-text-wrapper" onClick={e => updateStatPanel(true)}>
 				<div className="one">
 					{image.length > 0 &&
 						<img style={{height:"30px", width:"30px", top:"50%", webkitTransform: "translate(0%, 50%)"}} src={image}/>
@@ -40,6 +41,9 @@ function LineCard({line, station}){
 				</div>
 			</div>
 			<div style={{height:"10px"}}></div>
+			{statPanel && 
+				<div>TEST</div>
+			}
 		</>
 
 		)
