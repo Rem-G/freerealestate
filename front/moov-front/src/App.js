@@ -5,9 +5,11 @@ function App() {
 
   const [station, updateStation] = useState("");
   const [searchReq, updateSearchReq] = useState("");
+  const [loaded, updateLoaded] = useState(new Set());
+
   return (
     <div className="App">
-      <Transport station={station} updateStation={updateStation} searchReq={searchReq} updateSearchReq={updateSearchReq}/>
+      <Transport loaded={loaded} updateLoaded={updateLoaded} station={station} updateStation={updateStation} searchReq={searchReq} updateSearchReq={updateSearchReq}/>
     </div>
   )
 }

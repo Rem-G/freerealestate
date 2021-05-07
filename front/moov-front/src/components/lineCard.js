@@ -40,6 +40,7 @@ function LineCard({line, station}){
 
 	useEffect(() => {
 		fetchResults();
+		updateStatPanel(false);
 	}, [line, station])
 
 	return (

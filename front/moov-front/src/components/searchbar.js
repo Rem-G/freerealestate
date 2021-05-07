@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect} from 'react';
 import axios from "axios";
 import "../style/searchbar.css";
 
-function SearchBar({station, updateStation}){
+function SearchBar({station, updateStation, updateLoaded}){
     const [suggestions, updateSuggestions] = useState([])
 
 	//replace with findStation
@@ -22,7 +22,7 @@ function SearchBar({station, updateStation}){
 		.get('http://127.0.0.1:8000/api/transport/station/'+req_station+"/"+req_network)
 		.then(response => {
 			response.data.network.forEach(element => {
-				if (element.station === req_station) { updateStation(element); }
+				if (element.station === req_station) { updateStation(element); updateLoaded(new Set()); }
 			});
 		})
 		.catch(err => {console.log(err);});

@@ -17,7 +17,7 @@ const FreqChart = ({station, line}) => {
                 {
                     label: 'number',
                     fill: true,
-                    backgroundColor: "rgba(243, 174, 98, 0.2)",
+                    backgroundColor: "rgba(155, 205, 178, 0.5)",
                     data: response.data.frequentation.values,
                 },
                 ],

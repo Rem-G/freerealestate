@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LineCard from "./lineCard";
 import "../style/timeTablePanel.css";
 
-function TimeTablePanel({station}){
+function TimeTablePanel({station, loaded, updateLoaded}){
     const [lines, updateLines] = useState([])
 
     async function fetchResults() {
@@ -11,7 +11,8 @@ function TimeTablePanel({station}){
 		.get('http://localhost:8000/api/transport/nextdepartures/'+station.station+"/"+station.network)
         .then(response => {
             updateLines(response.data.next_departures);
-        }
+			updateLoaded(loaded.add("nextdepartures"));
+        	}
         )
 		.catch(err => {console.log(err);});
 	};

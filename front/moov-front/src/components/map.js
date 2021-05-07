@@ -8,15 +8,6 @@ import MapLegend from './mapLegend';
 
 import 'leaflet/dist/leaflet.css';
 import "../style/map.css";
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 function ChangeView({center, zoom}) {
     if (center === [48.864716, 2.349014]){ zoom = 7 }
@@ -25,7 +16,7 @@ function ChangeView({center, zoom}) {
     return null;
   } 
 
-export default function Map({station, searchReq}){
+export default function Map({station, loaded, updateLoaded}){
     const [liveBus, updateLiveBus] = useState([]);
     const [lines, updateLines] = useState([]);
 
@@ -34,6 +25,7 @@ export default function Map({station, searchReq}){
         .get("http://localhost:8000/api/transport/livebus/"+station.station+"/"+station.network)
         .then(response => {
           updateLiveBus(response.data.live);
+          updateLoaded(loaded.add("live"));
         })
         .catch(err => {console.log(err);});
       }
@@ -42,6 +34,7 @@ export default function Map({station, searchReq}){
       axios.get("http://localhost:8000/api/transport/topo/"+station.station+"/"+station.network)
       .then(response => {
         updateLines(response.data.topo);
+        updateLoaded(loaded.add("topo"));
         })
       .catch(err => {console.log(err);});
     }
@@ -72,7 +65,7 @@ export default function Map({station, searchReq}){
                 // const imgUrl = "../static/img/"+bus.fields.nomcourtligne+".png";
                 const position = bus.geometry.coordinates;
                 const icon = new L.icon({
-                  iconUrl: "https://i.ya-webdesign.com/images/sample-png-image-download-3.png",          
+                  iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfV_-pn70JnLJCoMn_X3sgNCp_CGHQbho0IQ&usqp=CAU",          
                   iconSize:     [30, 30], // size of the icon
                   iconAnchor:   {position}, // point of the icon which will correspond to marker's location
                   // popupAnchor:  {position} // point from which the popup should open relative to the iconAnchor
