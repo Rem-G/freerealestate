@@ -72,7 +72,7 @@ export default function Map({station, searchReq}){
                 // const imgUrl = "../static/img/"+bus.fields.nomcourtligne+".png";
                 const position = bus.geometry.coordinates;
                 const icon = new L.icon({
-                  iconUrl: "https://i.ya-webdesign.com/images/sample-png-image-download-3.png",          
+                  iconUrl: "https://img.icons8.com/cotton/2x/bus--v2.png",          
                   iconSize:     [30, 30], // size of the icon
                   iconAnchor:   {position}, // point of the icon which will correspond to marker's location
                   // popupAnchor:  {position} // point from which the popup should open relative to the iconAnchor
