@@ -205,3 +205,25 @@ class Star:
 					data[line][dest]["next_departures"].append(self.convert_dt_string(rec.get("fields").get(depart_var)))
 
 		return self.format_next_departures(data)
+
+
+	def get_alertes_trafic(self, id_station, type_a):
+		alertes = requests.get('https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-busmetro-trafic-alertes-tr&q=&rows=10000&facet=niveau&facet=debutvalidite&facet=finvalidite&facet=idligne&facet=nomcourtligne').json()['records']
+		res = {}
+		res['BUS'] = []
+		res['METRO'] = []
+		res['TRAM'] = []
+		station_lines = self.get_station_lines(id_station)
+		for alerte in alertes:
+			if alerte['fields']['niveau'] == "Majeure":
+				a = {}
+				a['ligne_cli'] = alerte["fields"]['nomcourtligne']
+				a['debut'] = alerte["fields"]['debutvalidite']
+				a['titre'] = alerte["fields"]['titre']
+				a['message'] = alerte["fields"]['description']
+				if alerte["fields"]['nomcourtligne'] == "A":
+					res['METRO'].append(a)
+				else:
+					res['BUS'].append(a)
+
+		return res
