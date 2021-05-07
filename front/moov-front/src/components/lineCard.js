@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../style/lineCard.css";
 import axios from 'axios';
+import FreqChart from "./freqChart";
 
 function LineCard({line, station}){
     const [image, updateImage] = useState([]);
@@ -64,7 +65,9 @@ function LineCard({line, station}){
 			<div style={{height:"10px"}}></div>
 			{statPanel && 
 					<div className="statPanel">
-						<div className="premiereStat">[Insert Graph Here]</div>
+						<div className="premiereStat">
+							<FreqChart station={station} line={line.line} />
+						</div>
 					</div>
 			}
 		</>

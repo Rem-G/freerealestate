@@ -1,14 +1,38 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react'
 import { Line } from 'react-chartjs-2'
 import * as ChartAnnotation from '../utils/chartjs-plugin-annotation-0.5.7';
 
+const FreqChart = ({station, line}) => {
+    const [stationFreq, updateStationFreq] = useState({});
+    const [data, updateData] = useState({});
 
-const FreqChart = ({line}) => {
-  const [data, updateData] = useState({});
+    const fetchFreq = () => {
+		axios
+		.get('http://localhost:8000/api/transport/frequentation/'+line+'/'+station.network)
+        .then(response => {
+            updateStationFreq(response.data.frequentation);
+            updateData({
+                datasets: [
+                {
+                    label: 'number',
+                    fill: true,
+                    backgroundColor: "rgba(243, 174, 98, 0.2)",
+                    data: response.data.frequentation.values,
+                },
+                ],
+                labels: response.data.frequentation.labels,
+            });
+        }
+        )
+		.catch(err => {console.log(err);});
+	};
 
     const datasetKeyProvider=()=>{ 
         return btoa(Math.random()).substring(0,12)
     }
+
+    const ticksLabels = ["Faible", "Moyenne", "Haute"];
 
     const options = {
         responsive: true,
@@ -20,6 +44,7 @@ const FreqChart = ({line}) => {
               },
               ticks: {
                 fontSize: 10,
+                autoSkip: false
               }
 
           }],
@@ -31,7 +56,11 @@ const FreqChart = ({line}) => {
                     display: false,
                 },
                 ticks: {
-                  display: false,
+                    display: true,
+                    beginAtZero: true,
+                    callback: function(value, index, values) {
+                        return  ticksLabels[value];
+                    }
                 },
             },
           ],
@@ -53,7 +82,7 @@ const FreqChart = ({line}) => {
                 type: 'line',
                 mode: 'vertical',
                 scaleID: 'x-axis-0',
-                value: weather.current.sun_position_day.current,
+                value: stationFreq.current_index,
                 borderColor: 'grey',
                 borderWidth: 2,
               },
@@ -73,24 +102,13 @@ const FreqChart = ({line}) => {
 
 
   useEffect(() => {
-    updateData({
-        datasets: [
-        {
-            label: 'number',
-            fill: true,
-            backgroundColor: "rgba(243, 174, 98, 0.2)",
-            data: weather.current.sun_position_day.values,
-        },
-        ],
-        labels: weather.current.sun_position_day.labels,
-    });
-    
+    fetchFreq();
   // eslint-disable-next-line
   }, [line]);
 
   return (
-      <Line data={data} options={options} datasetKeyProvider={datasetKeyProvider} plugins={ChartAnnotation} />
+        <Line data={data} options={options} datasetKeyProvider={datasetKeyProvider} plugins={ChartAnnotation} />
   )
 }
 
-export default FreqChart
+export default FreqChart;

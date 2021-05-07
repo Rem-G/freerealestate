@@ -67,4 +67,13 @@ def get_alertes_trafic(request, network, station, type_a):
 	res = []
 	if network == "Lyon":
 		res = tcl.get_alertes_trafic(station, type_a)
+	if network == "Rennes":
+		res = star.get_alertes_trafic(station, type_a)
 	return JsonResponse({"alert": res})
+
+
+def get_line_frequentation(request, line, network):
+	if network == "Rennes":
+		res = star.get_line_frequentation(line)
+	
+	return JsonResponse({"frequentation": res})

@@ -14,6 +14,10 @@ def get_image(line, network):
 		with open(f'{static_path}/img/{line}_{network}.png', "rb") as image_file:
 			image_data = base64.b64encode(image_file.read()).decode('utf-8')
 
+	elif os.path.isfile(f'{static_path}/img/{line}_{network}.svg'):
+		with open(f'{static_path}/img/{line}_{network}.svg', "rb") as image_file:
+			image_data = base64.b64encode(image_file.read()).decode('utf-8')
+
 	else:
 		with open(f'{static_path}/img/notfound.png', "rb") as image_file:
 			image_data = base64.b64encode(image_file.read()).decode('utf-8')
