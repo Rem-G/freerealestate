@@ -22,10 +22,6 @@ function Load(){
 
 export default function Transport({loaded, updateLoaded, station, updateStation, searchReq, updateSearchReq}){
 
-	useEffect(() => {
-		console.log(loaded.size, loaded);
-	}, [station, loaded]);
-
 	return(
 		<div>
 			{loaded.size < 2 && station !== "" &&

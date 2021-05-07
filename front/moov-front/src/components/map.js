@@ -33,8 +33,8 @@ export default function Map({station, loaded, updateLoaded}){
     const fetchStarLines = () => {
       axios.get("http://localhost:8000/api/transport/topo/"+station.station+"/"+station.network)
       .then(response => {
-        updateLines(response.data.topo);
-        updateLoaded(loaded.add("topo"));
+          updateLines(response.data.topo);
+          updateLoaded(loaded.add("topo"));
         })
       .catch(err => {console.log(err);});
     }
@@ -65,10 +65,9 @@ export default function Map({station, loaded, updateLoaded}){
                 // const imgUrl = "../static/img/"+bus.fields.nomcourtligne+".png";
                 const position = bus.geometry.coordinates;
                 const icon = new L.icon({
-                  iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfV_-pn70JnLJCoMn_X3sgNCp_CGHQbho0IQ&usqp=CAU",          
+                  iconUrl: "https://img.icons8.com/cotton/2x/bus--v2.png",          
                   iconSize:     [30, 30], // size of the icon
-                  iconAnchor:   {position}, // point of the icon which will correspond to marker's location
-                  // popupAnchor:  {position} // point from which the popup should open relative to the iconAnchor
+                  iconAnchor: [15, 0], // point of the icon which will correspond to marker's location
                 });
                 return (<Marker id={index} position={position} icon={icon} >
                   <BusPopup bus={bus} station={station}></BusPopup>
