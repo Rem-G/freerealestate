@@ -37,6 +37,13 @@
     text-align: center;
 }
 
+.gif {
+    position: fixed;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+}
+
 .horaires {
     display: flex;
     flex-direction: line;

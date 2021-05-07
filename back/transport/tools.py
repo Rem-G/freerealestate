@@ -22,6 +22,17 @@ def get_image(line, network):
 
 	return ctx
 
+def get_gif():
+	ctx = dict()
+	static_path = Path(settings.STATICFILES_DIRS[0])
+
+	with open(f'{static_path}/img/realtime.gif', "rb") as image_file:
+		image_data = base64.b64encode(image_file.read()).decode('utf-8')
+	
+	ctx["gif"] = image_data
+
+	return ctx
+
 def get_station_suggestions(station):
 	queryset = Station.objects.filter(station__contains = station)
 	data = list(queryset.values())
