@@ -5,6 +5,7 @@ import FreqChart from "./freqChart";
 
 function LineCard({line, station}){
     const [image, updateImage] = useState([]);
+	const [gif, updateGif] = useState();
 	const [statPanel, updateStatPanel] = useState(false);
 
 	function click() {
@@ -16,13 +17,24 @@ function LineCard({line, station}){
 		}
 	}
 
+	const fetchGif = () => {
+		axios
+		.get('http://localhost:8000/api/transport/getgif/')
+		.then(response => {
+			updateGif("data:gif/gif;base64,"+response.data.ctx.gif)
+		})
+	};
+
+	useEffect(() => {
+		fetchGif();
+	})
+
     const fetchResults = () => {
 		axios
 		.get('http://localhost:8000/api/transport/getimage/'+line.line+'/'+station.network)
         .then(response => {
             updateImage("data:image/png;base64,"+response.data.ctx.image)
-        }
-        )
+        })
 		.catch(err => {console.log(err);});
 	};
 
@@ -41,6 +53,7 @@ function LineCard({line, station}){
 				<div className="two">
 					<span className="direction">{line.destination}</span>
 				</div>
+				<img className="gif" src={gif} style={{float:"left"}}></img>
 				<div className="three">
 					<ul className="horaires">
 						<li className="premierHoraire">{line.next_departures[0]}</li>
