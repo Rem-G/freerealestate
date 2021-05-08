@@ -48,35 +48,19 @@ class TCL:
         actuel = datetime.datetime.now().strftime('%H:%M:%S')
         semaine = {0: 'monday',1: 'tuesday',2: 'wednesday',3: 'thursday',4: 'friday',5:'saturday',6: 'sunday'}
         jour = semaine[datetime.datetime.today().weekday()]
-        try:
-            station = int(station)
-        except:
-            pass
-
-        if type(station) == str:
-            stations = self.df[self.df["stop_name"] == station]
-            for sta in stations.index:
-                heures = self.rechercheHeure(stations['stop_id'][sta], jour)
-                donnee = []
-                for i in heures:
-                    if len(donnee) > 3:
-                        break
-                    if(i > actuel):
-                        donnee.append(i)
-                data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departures": donnee})
-            return data
-
-        else:
-            stations = self.df[self.df["stop_id"] == station]
-            heures = self.rechercheHeure(int(stations['stop_id']), jour)
+        stations = self.df[self.df["stop_name"] == station]
+        for sta in stations.index:
+            heures = self.rechercheHeure(stations['stop_id'][sta], jour)
             donnee = []
             for i in heures:
-                if len(donnee) > 5:
+                if len(donnee) > 3:
                     break
                 if(i > actuel):
-                    donnee.append(i)
-            data.append({"line": list(stations['short_name'])[0], "destination": list(stations['destination'])[0],"next_departures": donnee})
-            return data
+                    newH = i.split(':')
+                    newH = f'{newH[0]}:{newH[1]}'
+                    donnee.append(newH)
+            data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departures": donnee})
+        return data
 
     # allert sur le résaux
     def get_alertes_trafic(self, id_station, type_a):
@@ -185,8 +169,10 @@ class TCL:
                     with open(f"{lieux}.svg", "wb") as f:
                         shutil.copyfileobj(image.raw, f)
 
+                    #Convertion en PNG
                     drawing = svg2rlg(f'{lieux}.svg')
                     renderPM.drawToFile(drawing, f'{lieux}.png', fmt='PNG')
                     os.remove(f'{lieux}.svg')
+
             except:
                 print('Image fail')
