@@ -24,7 +24,7 @@ export default function Transport({loaded, updateLoaded, station, updateStation,
 
 	return(
 		<div>
-			{loaded.size < 2 && station !== "" &&
+			{loaded.size < 1 && station !== "" &&
 				<Load/>
 			}
 			<Alert station={station}></Alert>

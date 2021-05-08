@@ -12,9 +12,13 @@ class RTM:
         self.calendar =  pd.read_parquet(f'{self.static_path}/gtfs_rtm/calendar.parquet.gzip')
         self.trips =  pd.read_parquet(f'{self.static_path}/gtfs_rtm/trips.parquet.gzip')
 
+
     def create_stations_db(self):
-        for i in self.df.index:
-            add_station_db(self.df["stop_name"][i], self.network, self.df["lat"][i], self.df["lon"][i])
+        newDf = self.df.loc[:, 'stop_name'].drop_duplicates()
+        for i in newDf.index:
+            lat = self.df[self.df["stop_name"] == newDf[i]]['lat'].values[0]
+            lon = self.df[self.df["stop_name"] == newDf[i]]['lon'].values[0]
+            add_station_db(station = newDf[i], network= self.network, lat=lat, lon=lon)
 
     def rechercheService(self,stop_id, jour):
         heure = []
@@ -26,45 +30,32 @@ class RTM:
                 return t
 
     def rechercheHeure(self,stop_id, jour):
+        path = "./dataV2/"
         service = self.rechercheService(stop_id, jour)
         type_transport = list(self.df[self.df['stop_id'] == stop_id]['type'])[0]
         ensembleTrips = list(set(self.trips[self.trips['service_id'] == service]['trip_id']))
         data = pd.read_parquet(f'{self.static_path}/gtfs_rtm/{type_transport}/{stop_id}.parquet.gzip')
         return sorted(data[data['trip_id'].isin(ensembleTrips)]['departure_time'])
 
-
     def get_station_next_depart(self, station):
         data = []
         actuel = datetime.datetime.now().strftime('%H:%M:%S')
         semaine = {0: 'monday',1: 'tuesday',2: 'wednesday',3: 'thursday',4: 'friday',5:'saturday',6: 'sunday'}
-        jour = semaine[ datetime.datetime.today().weekday()]
+        jour = semaine[datetime.datetime.today().weekday()]
+
+
         stations = self.df[self.df["stop_name"] == station]
         for sta in stations.index:
-            heures = self.rechercheHeure(stations['stop_id'][sta], jour)
-            donnee = []
-            for i in heures:
-                if len(donnee) > 5:
-                    break
-                if(i > actuel):
-                    donnee.append(i)
-            data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departure": donnee})
+            if stations['stop_name'][sta] != stations['destination'][sta]: #Ne pas afficher les heures si nous sommes au terminus
+                heures = self.rechercheHeure(stations['stop_id'][sta], jour)
+                donnee = []
+                for i in heures:
+                    if len(donnee) > 3:
+                        break
+                    if(i > actuel):
+                        newH = i.split(':')
+                        newH = f'{newH[0]}:{newH[1]}'
+                        donnee.append(newH)
 
+                data.append({"line": stations['short_name'][sta], "destination": stations['destination'][sta], "next_departures": donnee})
         return data
-
-
-    def tempsReel(self, stop_id):
-        url = "https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclpassagearret/all.json?maxfeatures=10000&start=1"
-        payload={}
-        headers = {'Authorization': 'Basic bG9pYy52aWV1QGV0dS51bml2LXNtYi5mcjpsb2xvbGlBOTw='}
-        boucle = True
-        while boucle:
-            response = requests.request("GET", url, headers=headers, data=payload)
-            newDf= pd.DataFrame.from_dict(response.json()['values'])
-            if len(newDf[newDf["id"] == stop_id]) == 0:
-                print(response.json().keys())
-                if('next' in response.json().keys()):
-                    url = response.json()['next']
-                else:
-                    boucle = False
-            else:
-                return list(newDf[newDf["id"] == stop_id]["heurepassage"])

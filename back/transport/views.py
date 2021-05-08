@@ -10,6 +10,7 @@ from .tools import *
 star = Star()
 tcl = TCL()
 ilevia = Ilevia()
+rtm = RTM()
 
 def find_station_suggestions(request, station):
 	res = get_station_suggestions(station)
@@ -24,7 +25,7 @@ def create_db(request):
 	tcl.create_stations_db()
 	ilevia.create_stations_db()
 	star.create_stations_db()
-	# rtm.create_stations_db()
+	rtm.create_stations_db()
 	return JsonResponse({"Done": True})
 
 def test(request):
@@ -37,8 +38,9 @@ def get_next_departures(request, station, network):
 		res = star.get_station_next_depart(station)
 	elif network == 'Lyon':
 		res = tcl.get_station_next_depart(station)
-	# elif network == 'RTM':
-	# 	res = rtm.get_station_next_depart(station)
+	elif network == 'Marseille':
+		res = rtm.get_station_next_depart(station)
+
 	return JsonResponse({"next_departures": res})
 
 def get_image_request(request, line, network):
