@@ -142,10 +142,14 @@ class TCL:
                     new['fields']['parcours'] = {}
                     coo = []
                     for j in i['fields']['geo_shape']['coordinates']:
-                        coo.append([j[1],j[0]])
-                        # for u in j:
-                        #     coo2.append([u[1], u[0]])
-                        # coo.append(coo2)
+                        if type(j[0]) == list:
+                            ar = []
+                            for u in j:
+                                ar.append([u[1], u[0]])
+                            coo.append(ar)
+                        else:
+                            coo.append([j[1],j[0]])
+
                     new['fields']['parcours']['coordinates'] = coo
                     new['fields']['nomcourtLigne'] = i['fields']['ligne']
                     res.append(new)
@@ -160,7 +164,7 @@ class TCL:
             if type_t == "FUNICULAIRE":
                 type_t = "METRO"
             nam_s = df_stations['short_name'][station]
-            recherche(self.topo[type_t], nam_s,res)
+            res = recherche(self.topo[type_t], nam_s,res)
 
         return res
 
