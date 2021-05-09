@@ -9,27 +9,12 @@ import Collapse from '@material-ui/core/Collapse';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import { red } from '@material-ui/core/colors';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import '../style/alert_card.css'
+import TransportImage from "./transportImage";
+
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: 345,
-    minWidth: 345,
-    // maxHeight: 200,
-    minHeight: 200
-  },
-  roobis : {
-    // maxWidth: 345,
-    // minWidth: 345,
-    maxHeight: 200,
-    minHeight: 40
-  },
-  media: {
-    height: 0,
-    paddingTop: '56.25%', // 16:9
-    maxHeight: '30%'
-  },
   expand: {
     transform: 'rotate(0deg)',
     marginLeft: 'auto',
@@ -39,13 +24,10 @@ const useStyles = makeStyles((theme) => ({
   },
   expandOpen: {
     transform: 'rotate(180deg)',
-  },
-  avatar: {
-    backgroundColor: red[500],
-  },
+  }
 }));
 
-export default function RecipeReviewCard({ligne, date, titre, message}) {
+export default function RecipeReviewCard({ligne, date, titre, message, station}) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
 
@@ -54,23 +36,13 @@ export default function RecipeReviewCard({ligne, date, titre, message}) {
   };
 
   return (
-    <Card className={classes.root}>
-      <CardHeader
-        avatar={
-          <Avatar aria-label="recipe" className={classes.avatar}>
-            {ligne}
-          </Avatar>
-        }
+    <div className="root">
+      <div className="alertHeader">
+        <TransportImage transport={ligne} network={station.network} width={"40px"} height={"40px"}></TransportImage>
+        <span style={{fontSize:"15px", color:"rgba(0, 0, 0, 0.7", marginTop:"10px"}}>Date de début : {date}</span>
+        <span style={{marginTop:"30px"}}>{titre}</span>
+      </div>
 
-        title = {'Ligne : ' + ligne}
-        subheader={'Date de début : ' + date}
-      />
-
-      <CardContent className = {classes.roobis}>
-        <Typography variant="body2" color="textSecondary" component="p">
-            {titre}
-        </Typography>
-      </CardContent>
       <CardActions disableSpacing>
         <IconButton
           className={clsx(classes.expand, {
@@ -83,6 +55,7 @@ export default function RecipeReviewCard({ligne, date, titre, message}) {
           <ExpandMoreIcon />
         </IconButton>
       </CardActions>
+
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <Typography paragraph>Description:</Typography>
@@ -91,6 +64,6 @@ export default function RecipeReviewCard({ligne, date, titre, message}) {
           </Typography>
         </CardContent>
       </Collapse>
-    </Card>
+    </div>
   );
 }

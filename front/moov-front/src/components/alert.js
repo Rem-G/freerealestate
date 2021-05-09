@@ -3,9 +3,10 @@ import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import '../style/alert.css'
 import axios from "axios";
-import RecipeReviewCard from './alert_card'
+import AlertCard from './alertCard'
 import WarningIcon from '@material-ui/icons/Warning';
-import { TwitterTimelineEmbed, TwitterShareButton, TwitterFollowButton, TwitterHashtagButton, TwitterMentionButton, TwitterTweetEmbed, TwitterMomentShare, TwitterDMButton, TwitterVideoEmbed, TwitterOnAirButton } from 'react-twitter-embed';
+import { TwitterTimelineEmbed } from 'react-twitter-embed';
+import { Button } from "@material-ui/core";
 
 
 export default function Alert ({station}) {
@@ -34,19 +35,20 @@ export default function Alert ({station}) {
     if (isKeyExists(alertes, 'BUS')) {
     return(
     <div className= "alert_panel">
-    <Popup trigger={<WarningIcon style={{ fontSize: 40 }}></WarningIcon>} position="center">
+    <Popup trigger={<Button style={{ fontSize: "10px", borderRadius:"5px", padding: "15px", textAlign: "center", width: "100%" }}>Informations réseau</Button>} position="center">
     <div className = "pop_up">
-        <h2>Information résaux</h2>
+        <h2>Informations réseau</h2>
 
         {/* Visualisaton des Metro */}
 
             {alertes.METRO.length > 0 && <div>
             <div className= "metro_tram_bus">
-            <h3 className = "back">Alerte Metro</h3>
+            <h3 className = "back">Métro</h3>
             {alertes.METRO.map(alerte =>
-            <div className = "card_div">
-            <RecipeReviewCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message}/>
-            </div>
+                <div className="alertWrapper">
+                    <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
+                    <div style={{height:"10px"}}></div>
+                </div>
             )
             }
             </div>
@@ -55,10 +57,10 @@ export default function Alert ({station}) {
 
             {alertes.TRAM.length > 0 && <div>
             <div className= "metro_tram_bus">
-            <h3 className = "back">Alerte tram</h3>
+            <h3 className = "back">Tramway</h3>
             {alertes.TRAM.map(alerte =>
             <div className = "card_div">
-            <RecipeReviewCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message}/>
+            <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
             </div>
             )
             }
@@ -68,10 +70,10 @@ export default function Alert ({station}) {
 
             {alertes.BUS.length > 0 && <div>
             <div className= "metro_tram_bus">
-            <h3 className = "back">Alerte bus</h3>
+            <h3 className = "back">Bus</h3>
             {alertes.BUS.map(alerte =>
             <div className = "card_div">
-            <RecipeReviewCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message}/>
+            <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
             </div>
             )
             }

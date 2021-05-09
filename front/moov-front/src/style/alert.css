@@ -1,30 +1,31 @@
 .alert_panel {
     position: fixed;
-    width: 5%;
-    min-height: 50%;
-    max-height: 95%;
+    display: flex;
+    justify-content: center;
+    width: 160px;
+    height: 40px;
     top: 1%;
-    right: 80%;
+    left: 20%;
     z-index: 3;
-    overflow-y: auto;
-    padding-bottom: 10px;
+    border-radius: 5px;
+    background-color: rgb(255, 255, 255);
 }
 
 .pop_up {
-    position: fixed;
-    width: 60%;
-    background: white;
-    border-radius: 5px;
-    text-align: center;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    font-size: medium;
-    box-shadow: 0 5px 5px rgba(70, 95, 185, .05), 0 5px 5px rgba(106, 123, 201, .2);
-    padding: 15px;
-    max-height: 70%;
-    overflow-y: auto;
-
+  position: fixed;
+  width: 30%;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 5px;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  font-size: medium;
+  box-shadow: 0 5px 5px rgba(70, 95, 185, .05), 0 5px 5px rgba(106, 123, 201, .2);
+  padding: 15px;
+  max-height: 70%;
+  overflow-y: auto;
+  margin: auto;
 }
 
 .button {
@@ -43,17 +44,24 @@
     font-weight: 200;
   }
 
-  .card_div {
-    float:left;
-    padding: 2px;
+  .alertWrapper {
+    display: flex;
+    justify-content: center;
+    padding: 5px;
+    max-height: 150px;
   }
 
   .metro_tram_bus{
-      padding: 3.3%;
-      float: none;
-      overflow: hidden;
+      padding: 3%;
+      float: none;  
   }
 
   .back{
-    background-image: url("https://upload.wikimedia.org/wikipedia/commons/3/33/For%C3%AAt_am%C3%A9rique_du_sud.jpg");
+    height: 30px;
+    background-color: rgba(195, 0, 0, 0.8);
+    text-align: center;
+    border-radius: 5px;
+    color: white;
+    vertical-align: middle;
+    line-height: 30px;
   }

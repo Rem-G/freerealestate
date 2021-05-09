@@ -1,0 +1,15 @@
+.root {
+    width: 90%;
+    height: 90%;
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 5px 10px rgba(140, 165, 185, .05), 0 5px 15px rgba(166, 173, 201, .1);
+}
+
+.alertHeader {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
