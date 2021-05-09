@@ -3,13 +3,11 @@ from django.http import JsonResponse
 
 from .Star import Star
 from .TCL import TCL
-from .Ilevia import Ilevia
 from .RTM import RTM
 from .tools import *
 
 star = Star()
 tcl = TCL()
-ilevia = Ilevia()
 rtm = RTM()
 
 def find_station_suggestions(request, station):
@@ -23,7 +21,6 @@ def get_station_infos(request, station, network):
 def create_db(request):
 	drop_table()
 	tcl.create_stations_db()
-	# ilevia.create_stations_db()
 	rtm.create_stations_db()
 	star.create_stations_db()
 	return JsonResponse({"Done": True})
