@@ -41,43 +41,39 @@ export default function Alert ({station}) {
 
         {/* Visualisaton des Metro */}
 
-            {alertes.METRO.length > 0 && <div>
+            {alertes.METRO.length > 0 && 
             <div className= "metro_tram_bus">
             <h3 className = "back">Métro</h3>
             {alertes.METRO.map(alerte =>
                 <div className="alertWrapper">
                     <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
-                    <div style={{height:"10px"}}></div>
+                    {/* <div style={{height:"10px"}}></div> */}
                 </div>
-            )
-            }
-            </div>
+            )}
             </div>
             }
 
-            {alertes.TRAM.length > 0 && <div>
+            {alertes.TRAM.length > 0 &&
             <div className= "metro_tram_bus">
-            <h3 className = "back">Tramway</h3>
-            {alertes.TRAM.map(alerte =>
-            <div className = "card_div">
-            <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
-            </div>
-            )
-            }
-            </div>
+                <h3 className = "back">Tramway</h3>
+                {alertes.TRAM.map(alerte =>
+                    <div className="alertWrapper">
+                        <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
+                        {/* <div style={{height:"10px"}}></div> */}
+                    </div>
+                )}
             </div>
             }
 
-            {alertes.BUS.length > 0 && <div>
+            {alertes.BUS.length > 0 &&
             <div className= "metro_tram_bus">
-            <h3 className = "back">Bus</h3>
-            {alertes.BUS.map(alerte =>
-            <div className = "card_div">
-            <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
-            </div>
-            )
-            }
-            </div>
+                <h3 className = "back">Bus</h3>
+                {alertes.BUS.map(alerte =>
+                    <div className="alertWrapper">
+                        <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
+                        {/* <div style={{height:"10px"}}></div> */}
+                    </div>
+                )}
             </div>
             }
     </div>
