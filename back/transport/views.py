@@ -75,6 +75,7 @@ def get_alertes_trafic(request, network, station, type_a):
 
 
 def get_line_frequentation(request, line, network):
+	res = []
 	if network == "Rennes":
 		res = star.get_line_frequentation(line)
 	

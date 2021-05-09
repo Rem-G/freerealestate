@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../style/lineCard.css";
 import axios from 'axios';
 import FreqChart from "./freqChart";
+import TransportImage from "./transportImage";
 
 function LineCard({line, station}){
     const [image, updateImage] = useState([]);
@@ -9,11 +10,13 @@ function LineCard({line, station}){
 	const [statPanel, updateStatPanel] = useState(false);
 
 	function click() {
-		if(statPanel == true) {
-			updateStatPanel(false); 
-		}
-		else {
-			updateStatPanel(true);
+		if (station.network === "Rennes"){
+			if(statPanel == true) {
+				updateStatPanel(false); 
+			}
+			else {
+				updateStatPanel(true);
+			}
 		}
 	}
 
@@ -33,23 +36,24 @@ function LineCard({line, station}){
 		axios
 		.get('http://localhost:8000/api/transport/getimage/'+line.line+'/'+station.network)
         .then(response => {
-            updateImage("data:image/png;base64,"+response.data.ctx.image)
+            updateImage("data:image/png;base64,"+response.data.ctx.image);
         })
 		.catch(err => {console.log(err);});
 	};
 
 	useEffect(() => {
-		fetchResults();
+		// fetchResults();
 		updateStatPanel(false);
 	}, [line, station])
 
 	return (
 		<>
 			<div className="result-text-wrapper" onClick={e => click()}>
-				<div className="one">
-					{image.length > 0 &&
+				<div className="one" >
+					{/* {image.length > 0 &&
 						<img style={{height:"30px", width:"30px", top:"50%", webkitTransform: "translate(0%, 50%)"}} src={image}/>
-					}
+					} */}
+					<TransportImage transport={line.line} network={station.network} width={"30px"} height={"30px"} top={"50%"} webkitTransform={"translate(0%, 50%)"}></TransportImage>
 				</div>
 				<div className="two">
 					<span className="direction">{line.destination}</span>

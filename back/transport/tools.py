@@ -9,13 +9,13 @@ import os.path
 def get_image(line, network):
 	ctx = dict()
 	static_path = Path(settings.STATICFILES_DIRS[0])
+	img_type = "png"
 
-	if os.path.isfile(f'{static_path}/img/{line}_{network}.png'):
+	if network == "Lyon":
+		return {"image": f"https://www.tcl.fr/themes/custom/sytral_theme/img/lignes/{line}.svg", "type": "svg"}
+
+	elif os.path.isfile(f'{static_path}/img/{line}_{network}.png'):
 		with open(f'{static_path}/img/{line}_{network}.png', "rb") as image_file:
-			image_data = base64.b64encode(image_file.read()).decode('utf-8')
-
-	elif os.path.isfile(f'{static_path}/img/{line}_{network}.svg'):
-		with open(f'{static_path}/img/{line}_{network}.svg', "rb") as image_file:
 			image_data = base64.b64encode(image_file.read()).decode('utf-8')
 
 	else:
@@ -24,7 +24,7 @@ def get_image(line, network):
 
 	ctx["image"] = image_data
 
-	return ctx
+	return {"image": image_data, "type": img_type}
 
 def get_gif():
 	ctx = dict()

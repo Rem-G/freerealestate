@@ -31,7 +31,7 @@ export default function MapLegend({lines, station}) {
             {legendLines.map((line) =>
                 <div className="legend-card-row">
                     <div className="legend-card-column" style={{width: "30px"}}>
-                        <TransportImage transport={line.fields.nomcourtligne} network={station.network}></TransportImage>
+                        <TransportImage transport={line.fields.nomcourtligne} network={station.network} width={"20px"} height={"20px"} position={"relative"}></TransportImage>
                     </div>
                     <div className="legend-card-column" style={{background: line.fields.couleurtrace, width:"15px", height:"4px", top:"50%"}}></div>
                 </div>

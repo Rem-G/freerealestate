@@ -20,7 +20,6 @@ class TCL:
 
     def create_stations_db(self):
         newDf = self.df.loc[:, 'stop_name'].drop_duplicates()
-        self.download_img_all()
         for i in newDf.index:
             lat = self.df[self.df["stop_name"] == newDf[i]]['lat'].values[0]
             lon = self.df[self.df["stop_name"] == newDf[i]]['lon'].values[0]
@@ -151,28 +150,3 @@ class TCL:
             res = recherche(self.topo[type_t], nam_s,res)
 
         return res
-
-
-
-
-
-
-    def download_img_all(self):
-        path = Path(settings.STATICFILES_DIRS[0])
-        lignes = self.df['short_name'].drop_duplicates().values
-        for ligne in lignes:
-            try:
-                image = requests.get(f"https://www.tcl.fr/themes/custom/sytral_theme/img/lignes/{ligne}.svg",  stream = True)
-                if image.status_code == 200:
-                    image.raw.decode_content = True
-                    lieux = f"{path}/img/{ligne}_Lyon"
-                    with open(f"{lieux}.svg", "wb") as f:
-                        shutil.copyfileobj(image.raw, f)
-
-                    #Convertion en PNG
-                    drawing = svg2rlg(f'{lieux}.svg')
-                    renderPM.drawToFile(drawing, f'{lieux}.png', fmt='PNG')
-                    os.remove(f'{lieux}.svg')
-
-            except:
-                print('Image fail')
