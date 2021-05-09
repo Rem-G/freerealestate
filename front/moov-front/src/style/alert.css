@@ -2,13 +2,7 @@
     position: fixed;
     display: flex;
     justify-content: center;
-    width: 160px;
-    height: 40px;
-    top: 1%;
-    left: 20%;
-    z-index: 3;
-    border-radius: 5px;
-    background-color: rgb(255, 255, 255);
+    z-index: 2;
 }
 
 .pop_up {
@@ -28,7 +22,7 @@
   margin: auto;
 }
 
-.button {
+/* .button {
     z-index: 50;
     position: absolute;
     display: flex;
@@ -42,7 +36,7 @@
     font-size: 20px;
     letter-spacing: 1px;
     font-weight: 200;
-  }
+  } */
 
   .alertWrapper {
     display: flex;
@@ -63,4 +57,31 @@
     color: white;
     vertical-align: middle;
     line-height: 30px;
+  }
+
+  .alert-button {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    margin-top: 5px;
+    left: 20%;
+    height: 38px;
+    width: 150px;
+    line-height: 20px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 12px;
+    border-radius: 5px;
+    text-align: center;
+    background: rgba(81, 157, 224, 1);
+    color: white;
+    border: none;
+    /* -webkit-transform: translate(40%, 0%); */
+
+  }
+
+  .alert-button:hover {
+    background: rgba(61, 137, 204, 1);
   }

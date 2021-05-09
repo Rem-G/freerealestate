@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
-import '../style/alert.css'
 import axios from "axios";
 import AlertCard from './alertCard'
 import WarningIcon from '@material-ui/icons/Warning';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import { Button } from "@material-ui/core";
-
+import '../style/alert.css'
 
 export default function Alert ({station}) {
+    const [alertes, update_alerte] = useState({});
+    const [openPanel, updateOpenPanel] = useState(false);
 
-    const [alertes, update_alerte] = useState({})
+    const handleOpenPanel = () => { updateOpenPanel(!openPanel); }
+
     function isKeyExists(obj,key){
         if(obj[key] == undefined ){
             return false;
@@ -34,53 +35,52 @@ export default function Alert ({station}) {
 
     if (isKeyExists(alertes, 'BUS')) {
     return(
-    <div className= "alert_panel">
-    <Popup trigger={<Button style={{ fontSize: "10px", borderRadius:"5px", padding: "15px", textAlign: "center", width: "100%" }}>Informations réseau</Button>} position="center">
-    <div className = "pop_up">
-        <h2>Informations réseau</h2>
+        <>
+        <button className="alert-button" onClick={handleOpenPanel}>Informations</button>
+        {openPanel &&
+            <div className= "alert_panel">
+                <div className = "pop_up">
+                    <h2>Informations réseau</h2>
 
-        {/* Visualisaton des Metro */}
+                    {/* Visualisaton des Metro */}
 
-            {alertes.METRO.length > 0 && 
-            <div className= "metro_tram_bus">
-            <h3 className = "back">Métro</h3>
-            {alertes.METRO.map(alerte =>
-                <div className="alertWrapper">
-                    <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
-                    {/* <div style={{height:"10px"}}></div> */}
+                    {alertes.METRO.length > 0 && 
+                        <div className= "metro_tram_bus">
+                            <h3 className = "back">Métro</h3>
+                            {alertes.METRO.map(alerte =>
+                                <div className="alertWrapper">
+                                    <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
+                                </div>
+                            )}
+                        </div>
+                    }
+
+                    {alertes.TRAM.length > 0 &&
+                        <div className= "metro_tram_bus">
+                            <h3 className = "back">Tramway</h3>
+                            {alertes.TRAM.map(alerte =>
+                                <div className="alertWrapper">
+                                    <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
+                                </div>
+                            )}
+                        </div>
+                    }
+
+                    {alertes.BUS.length > 0 &&
+                        <div className= "metro_tram_bus">
+                            <h3 className = "back">Bus</h3>
+                            {alertes.BUS.map(alerte =>
+                                <div className="alertWrapper">
+                                    <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
+                                </div>
+                            )}
+                        </div>
+                    }
                 </div>
-            )}
             </div>
-            }
-
-            {alertes.TRAM.length > 0 &&
-            <div className= "metro_tram_bus">
-                <h3 className = "back">Tramway</h3>
-                {alertes.TRAM.map(alerte =>
-                    <div className="alertWrapper">
-                        <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
-                        {/* <div style={{height:"10px"}}></div> */}
-                    </div>
-                )}
-            </div>
-            }
-
-            {alertes.BUS.length > 0 &&
-            <div className= "metro_tram_bus">
-                <h3 className = "back">Bus</h3>
-                {alertes.BUS.map(alerte =>
-                    <div className="alertWrapper">
-                        <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
-                        {/* <div style={{height:"10px"}}></div> */}
-                    </div>
-                )}
-            </div>
-            }
-    </div>
-    </Popup>
-    </div>
-    )
-    }
+        }
+    </>
+    )}
 
     if (station.network === "Lille") {
     return(
