@@ -6,7 +6,7 @@ urlpatterns = [
     re_path(r'findstation/(?P<station>[\w|\W]+)/', views.find_station_suggestions, name='station'),
     re_path(r'station/(?P<station>[\w|\W]+)/(?P<network>[\w|\W]+)', views.get_station_infos, name='station'),
     re_path(r'createdb/', views.create_db, name='create_db'),
-    re_path(r'test/', views.test),
+    # re_path(r'test/', views.test),
     re_path(r'getimage/(?P<line>[\w|\W]+)/(?P<network>[\w|\W]+)/', views.get_image_request),
     re_path(r'getgif/', views.get_gif_request),
     re_path(r'nextdepartures/(?P<station>[\w|\W]+)/(?P<network>[\w|\W]+)/', views.get_next_departures, name="get_next_departure"),

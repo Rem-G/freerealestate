@@ -23,13 +23,9 @@ def get_station_infos(request, station, network):
 def create_db(request):
 	drop_table()
 	tcl.create_stations_db()
-	ilevia.create_stations_db()
-	star.create_stations_db()
+	# ilevia.create_stations_db()
 	rtm.create_stations_db()
-	return JsonResponse({"Done": True})
-
-def test(request):
-	ilevia.get_info_at_bus_or_streetcar_stop("fort de mons")
+	star.create_stations_db()
 	return JsonResponse({"Done": True})
 
 def get_next_departures(request, station, network):

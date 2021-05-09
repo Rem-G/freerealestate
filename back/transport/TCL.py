@@ -134,7 +134,7 @@ class TCL:
                             coo.append([j[1],j[0]])
 
                     new['fields']['parcours']['coordinates'] = coo
-                    new['fields']['nomcourtLigne'] = i['fields']['ligne']
+                    new['fields']['nomcourtligne'] = i['fields']['ligne']
                     res.append(new)
             return res
 

@@ -5,7 +5,6 @@ import FreqChart from "./freqChart";
 import TransportImage from "./transportImage";
 
 function LineCard({line, station}){
-    const [image, updateImage] = useState([]);
 	const [gif, updateGif] = useState();
 	const [statPanel, updateStatPanel] = useState(false);
 
@@ -32,17 +31,7 @@ function LineCard({line, station}){
 		fetchGif();
 	})
 
-    const fetchResults = () => {
-		axios
-		.get('http://localhost:8000/api/transport/getimage/'+line.line+'/'+station.network)
-        .then(response => {
-            updateImage("data:image/png;base64,"+response.data.ctx.image);
-        })
-		.catch(err => {console.log(err);});
-	};
-
 	useEffect(() => {
-		// fetchResults();
 		updateStatPanel(false);
 	}, [line, station])
 
@@ -50,9 +39,6 @@ function LineCard({line, station}){
 		<>
 			<div className="result-text-wrapper" onClick={e => click()}>
 				<div className="one" >
-					{/* {image.length > 0 &&
-						<img style={{height:"30px", width:"30px", top:"50%", webkitTransform: "translate(0%, 50%)"}} src={image}/>
-					} */}
 					<TransportImage transport={line.line} network={station.network} width={"30px"} height={"30px"} top={"50%"} webkitTransform={"translate(0%, 50%)"}></TransportImage>
 				</div>
 				<div className="two">
