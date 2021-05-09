@@ -47,7 +47,6 @@ export default function Alert ({station}) {
             {alertes.METRO.map(alerte =>
                 <div className="alertWrapper">
                     <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
-                    <div style={{height:"10px"}}></div>
                 </div>
             )
             }
@@ -59,9 +58,9 @@ export default function Alert ({station}) {
             <div className= "metro_tram_bus">
             <h3 className = "back">Tramway</h3>
             {alertes.TRAM.map(alerte =>
-            <div className = "card_div">
-            <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
-            </div>
+                <div className="alertWrapper">
+                <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
+                </div>
             )
             }
             </div>
@@ -72,9 +71,9 @@ export default function Alert ({station}) {
             <div className= "metro_tram_bus">
             <h3 className = "back">Bus</h3>
             {alertes.BUS.map(alerte =>
-            <div className = "card_div">
-            <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
-            </div>
+                <div className = "alertWrapper">
+                    <AlertCard ligne = {alerte.ligne_cli}  date = {alerte.debut} titre = {alerte.titre} message = {alerte.message} station={station}/>
+                </div>
             )
             }
             </div>
