@@ -11,7 +11,6 @@ export default function MapLegend({lines, station}) {
 
     useEffect(() => {
         filterLegend();
-        console.log(lines);
     }, [lines]);
 
     const filterLegend = () => {
