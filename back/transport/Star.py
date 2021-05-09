@@ -210,7 +210,7 @@ class Star:
 
 
 	def get_alertes_trafic(self, id_station, type_a):
-		alertes = requests.get('https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-busmetro-trafic-alertes-tr&q=&rows=10000&facet=niveau&facet=debutvalidite&facet=finvalidite&facet=idligne&facet=nomcourtligne').json()['records']
+		alertes = request('https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-busmetro-trafic-alertes-tr&q=&rows=10000&facet=niveau&facet=debutvalidite&facet=finvalidite&facet=idligne&facet=nomcourtligne&timezone=Europe/Paris').get('records')
 		res = {}
 		res['BUS'] = []
 		res['METRO'] = []
@@ -218,9 +218,12 @@ class Star:
 		station_lines = self.get_station_lines(id_station)
 		for alerte in alertes:
 			if alerte['fields']['niveau'] == "Majeure":
+				dt = datetime.datetime.strptime(alerte["fields"]['debutvalidite'].split("+")[0], "%Y-%m-%dT%H:%M:%S")
+				dt_dict = self.add_0_to_dt({"hour": dt.hour, "min": dt.minute})
+
 				a = {}
 				a['ligne_cli'] = alerte["fields"]['nomcourtligne']
-				a['debut'] = alerte["fields"]['debutvalidite']
+				a['debut'] = f"{dt.day}-{dt.month}-{dt.year} {dt_dict['hour']}:{dt_dict['min']}"
 				a['titre'] = alerte["fields"]['titre']
 				a['message'] = alerte["fields"]['description']
 				if alerte["fields"]['nomcourtligne'] == "A":

@@ -1,12 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Collapse from '@material-ui/core/Collapse';
-import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -29,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RecipeReviewCard({ligne, date, titre, message, station}) {
   const classes = useStyles();
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -42,7 +39,7 @@ export default function RecipeReviewCard({ligne, date, titre, message, station})
         <span style={{fontSize:"15px", color:"rgba(0, 0, 0, 0.7", marginTop:"10px"}}>Date de début : {date}</span>
         <span style={{marginTop:"30px"}}>{titre}</span>
       </div>
-
+      
       <CardActions disableSpacing>
         <IconButton
           className={clsx(classes.expand, {
@@ -50,7 +47,6 @@ export default function RecipeReviewCard({ligne, date, titre, message, station})
           })}
           onClick={handleExpandClick}
           aria-expanded={expanded}
-          aria-label="show more"
         >
           <ExpandMoreIcon />
         </IconButton>
@@ -58,7 +54,6 @@ export default function RecipeReviewCard({ligne, date, titre, message, station})
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <Typography paragraph>Description:</Typography>
           <Typography paragraph>
             {message}
           </Typography>
