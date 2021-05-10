@@ -12,6 +12,8 @@ class Star:
 	def __init__(self):
 		self.network = "Star"
 		self.city = "Rennes"
+		self.next_departures_cache = {}
+		self.station_lines_cache = {}
 
 	def get_bus_stations(self):
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-pointsarret-td&q=&facet=nomstationparente&rows=10000"
@@ -88,14 +90,26 @@ class Star:
  		url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-{transport_type}-topologie-dessertes-td&q=&facet=libellecourtparcours&facet=nomcourtligne&facet=nomarret&facet=estmonteeautorisee&facet=estdescenteautorisee&refine.nomarret={station}"
  		return set([line.get("fields").get("nomcourtligne") for line in request(url).get("records")])
 
+	def get_station_lines_cache(self, station):
+		if len(self.station_lines_cache) and station in self.station_lines_cache.keys():
+			return self.station_lines_cache[station]
+		else:
+			station_lines = self.get_station_lines(station)
+			self.station_lines_cache[station] = station_lines
+			return station_lines
+
 	def get_topo(self, station):
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000"
 		res = []
-		station_lines = self.get_station_lines(station)
-		current_lines = [rec.get("line") for rec in self.get_station_next_depart(station)]
 
+		if len(self.next_departures_cache) and station in self.next_departures_cache.keys():
+			current_lines = [rec.get("line") for rec in self.next_departures_cache[station]]
+		else:
+			current_lines = [rec.get("line") for rec in self.get_station_next_depart(station)]
+
+		
 		for record in request(url).get("records"):
-			if record.get("fields").get("nomcourtligne") in station_lines and record.get("fields").get("nomcourtligne") in current_lines:
+			if record.get("fields").get("nomcourtligne") in self.get_station_lines_cache(station) and record.get("fields").get("nomcourtligne") in current_lines:
 				res.append(record)
 
 		metro_url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000&refine.nomcourtligne=a"
@@ -118,11 +132,10 @@ class Star:
 		return records
 
 	def get_live_bus_station(self, station):
-		station_lines = self.get_station_lines(station)
 		res = []
 
 		for record in self.get_live_bus():
-			if record.get("fields").get("nomcourtligne") in station_lines:
+			if record.get("fields").get("nomcourtligne") in self.get_station_lines_cache(station):
 				res.append(record)		
 		return self.convert_coor_live(res)
 
@@ -205,17 +218,19 @@ class Star:
 
 				if self.check_dt(rec.get("fields").get(depart_var)) and len(data[line][dest]["next_departures"]) < 3:
 					data[line][dest]["next_departures"].append(self.convert_dt_string(rec.get("fields").get(depart_var)))
+		res = self.format_next_departures(data)
+		self.next_departures_cache = {station: res}
+		return res
 
-		return self.format_next_departures(data)
 
-
-	def get_alertes_trafic(self, id_station, type_a):
+	def get_alertes_trafic(self, station, type_a):
 		alertes = request('https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-busmetro-trafic-alertes-tr&q=&rows=10000&facet=niveau&facet=debutvalidite&facet=finvalidite&facet=idligne&facet=nomcourtligne&timezone=Europe/Paris').get('records')
 		res = {}
 		res['BUS'] = []
 		res['METRO'] = []
 		res['TRAM'] = []
-		station_lines = self.get_station_lines(id_station)
+		station_lines = self.get_station_lines_cache(station)
+
 		for alerte in alertes:
 			if alerte['fields']['niveau'] == "Majeure":
 				dt = datetime.datetime.strptime(alerte["fields"]['debutvalidite'].split("+")[0], "%Y-%m-%dT%H:%M:%S")
