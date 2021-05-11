@@ -8,7 +8,7 @@ function SearchBar({station, updateStation, updateLoaded}){
 	//replace with findStation
     const onChangeHandler = event => {
         axios
-			.get(`http://127.0.0.1:8000/api/transport/findstation/${event.target.value}`)
+			.get(`https://moov-api.herokuapp.com/api/transport/findstation/${event.target.value}`)
 			.then(response => {
 				updateSuggestions(response.data.network);
 			}) 
@@ -19,7 +19,7 @@ function SearchBar({station, updateStation, updateLoaded}){
 	const fetchStation = (req_station, req_network) => {
 
 		axios
-		.get('http://127.0.0.1:8000/api/transport/station/'+req_station+"/"+req_network)
+		.get('https://moov-api.herokuapp.com/api/transport/station/'+req_station+"/"+req_network)
 		.then(response => {
 			response.data.network.forEach(element => {
 				if (element.station === req_station) { updateStation(element); updateLoaded(new Set()); }

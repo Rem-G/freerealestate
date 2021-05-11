@@ -103,13 +103,17 @@ class Star:
 		res = []
 
 		if len(self.next_departures_cache) and station in self.next_departures_cache.keys():
-			current_lines = [rec.get("line") for rec in self.next_departures_cache[station]]
+			current_lines = set([rec.get("line") for rec in self.next_departures_cache[station]])
 		else:
-			current_lines = [rec.get("line") for rec in self.get_station_next_depart(station)]
+			current_lines = set([rec.get("line") for rec in self.get_station_next_depart(station)])
 
 		
+		# station_lines = self.get_station_lines_cache(station)
+
+		# print(current_lines)
+		
 		for record in request(url).get("records"):
-			if record.get("fields").get("nomcourtligne") in self.get_station_lines_cache(station) and record.get("fields").get("nomcourtligne") in current_lines:
+			if record.get("fields").get("nomcourtligne") in current_lines:
 				res.append(record)
 
 		metro_url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000&refine.nomcourtligne=a"

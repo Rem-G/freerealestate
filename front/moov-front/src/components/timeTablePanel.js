@@ -8,7 +8,7 @@ function TimeTablePanel({station, loaded, updateLoaded}){
 
     async function fetchResults() {
 		axios
-		.get('http://localhost:8000/api/transport/nextdepartures/'+station.station+"/"+station.network)
+		.get('https://moov-api.herokuapp.com/api/transport/nextdepartures/'+station.station+"/"+station.network)
         .then(response => {
             updateLines(response.data.next_departures);
 			updateLoaded(loaded.add("nextdepartures"));

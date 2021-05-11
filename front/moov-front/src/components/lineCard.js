@@ -21,7 +21,7 @@ function LineCard({line, station}){
 
 	const fetchGif = () => {
 		axios
-		.get('http://localhost:8000/api/transport/getgif/')
+		.get('https://moov-api.herokuapp.com/api/transport/getgif/')
 		.then(response => {
 			updateGif("data:gif/gif;base64,"+response.data.ctx.gif)
 		})

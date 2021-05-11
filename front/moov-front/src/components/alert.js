@@ -21,7 +21,7 @@ export default function Alert ({station}) {
     }
     const fetchResults = () => {
 		axios
-		.get('http://127.0.0.1:8000/api/transport/alert/'+ station.network  + "/" + "all/2")
+		.get('https://moov-api.herokuapp.com/api/transport/alert/'+ station.network  + "/" + "all/2")
         .then(response => {
             update_alerte(response.data.alert)
         }
