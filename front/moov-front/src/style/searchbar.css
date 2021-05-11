@@ -78,7 +78,7 @@
     left: 50%;
     transform: translate(-50%, 23%);
     border-radius: 0px 0px 10px 10px;
-    max-width: 270px;
+    width: 270px;
     max-height: 200px;
     list-style-type: none;
     overflow: auto;
