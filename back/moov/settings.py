@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-leh+is7txl-knf!@ehxfyyi*08jl!y3-@jq3c!4w=tdp*)5l5%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['moov-api.herokuapp.com']
 
