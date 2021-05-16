@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-leh+is7txl-knf!@ehxfyyi*08jl!y3-@jq3c!4w=tdp*)5l5%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['moov-api.herokuapp.com']
+ALLOWED_HOSTS = ['moov-api.herokuapp.com', '*']
 
 CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True

@@ -346,10 +346,10 @@ class Star:
 		current_index = len(labels)-1
 
 		for label_index, label in enumerate(labels):
-			label_dt = datetime.datetime.strptime(f'{now.day}/{now.month}/{now.year} {label}', '%d/%m/%Y %H:%M')
+			label_dt = datetime.datetime.strptime(f'{now.day}-{now.month}-{now.year} {label}', '%d-%m-%Y %H:%M')
 
 			if label_index < len(labels)-1:
-				next_label_dt = datetime.datetime.strptime(f"{now.month}/{now.day}/{now.year} {labels[label_index+1]}", '%d/%m/%Y %H:%M')
+				next_label_dt = datetime.datetime.strptime(f"{now.day}-{now.month}-{now.year} {labels[label_index+1]}", '%d-%m-%Y %H:%M')
 				if now >= label_dt and now < next_label_dt:
 					current_index = label_index
 
