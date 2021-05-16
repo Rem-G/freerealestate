@@ -308,6 +308,9 @@ class Star:
 		return res 
 
 	def get_line_frequentation(self, line):
+		"""
+			Get frequentation for a given line
+		"""
 		if line == "a":
 			line = "Ligne a"
 
