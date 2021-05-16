@@ -244,6 +244,7 @@ class Star:
 			day_string = "Samedi"
 		elif weekday == 6:
 			day_string = "Dimanche"
+		day_string = "Lundi-vendredi"
 
 		url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=mkt-frequentation-niveau-freq-max-ligne&q=&sort=tranche_horaire&facet=materiel&facet=jour_semaine&facet=ligne&facet=tranche_horaire&facet=frequentation&facet=niveau_frequentation&refine.ligne={line}&refine.jour_semaine={day_string}&rows=100"
 		res = request(url).get("records")
