@@ -9,7 +9,14 @@ from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
 
 class TCL:
+    """
+    This class process all request for Lyon/TCL network.
+    All answers are standardized.
+    """
     def __init__(self) -> None:
+        """
+        City : Lyon | Network : TCL
+        """
         self.network = "Lyon"
         self.static_path = settings.STATICFILES_DIRS[0]
         self.df = pd.read_parquet(f'{self.static_path}/gtfs_tcl/arrets.parquet.gzip')
@@ -19,6 +26,10 @@ class TCL:
 
 
     def create_stations_db(self):
+        """
+			Add stations to DB
+			To prevent duplicates, the method return the list of inserted stations
+		"""
         newDf = self.df.loc[:, 'stop_name'].drop_duplicates()
         for i in newDf.index:
             lat = self.df[self.df["stop_name"] == newDf[i]]['lat'].values[0]
@@ -26,6 +37,9 @@ class TCL:
             add_station_db(station = newDf[i], network= self.network, lat=lat, lon=lon)
 
     def rechercheService(self,stop_id, jour):
+        """
+        Find correct service for a stop_id and day given
+        """
         heure = []
         id_route = list(self.df[self.df['stop_id'] == stop_id]['id_route'])[0]
         trip = list(set(self.trips[self.trips['route_id'] == id_route]['service_id']))
@@ -35,6 +49,9 @@ class TCL:
                 return t
 
     def rechercheHeure(self,stop_id, jour):
+        """
+        Return all hours for a stop and a day (monday ...)
+        """
         path = "./dataV2/"
         service = self.rechercheService(stop_id, jour)
         type_transport = list(self.df[self.df['stop_id'] == stop_id]['type'])[0]
@@ -43,6 +60,9 @@ class TCL:
         return sorted(data[data['trip_id'].isin(ensembleTrips)]['departure_time'])
 
     def get_station_next_depart(self, station):
+        """
+			Get 3 next departures at a given station
+		"""
         data = []
         actuel = datetime.datetime.now().strftime('%H:%M:%S')
         semaine = {0: 'monday',1: 'tuesday',2: 'wednesday',3: 'thursday',4: 'friday',5:'saturday',6: 'sunday'}
@@ -63,7 +83,9 @@ class TCL:
 
     # allert sur le résaux
     def get_alertes_trafic(self, id_station, type_a):
-
+        """
+		    Get all trafic alerts for TCL network
+		"""
         url = "https://download.data.grandlyon.com/ws/rdata/tcl_sytral.tclalertetrafic_2/all.json?maxfeatures=-1&start=1"
         payload={}
         headers = {'Authorization': 'Basic bG9pYy52aWV1QGV0dS51bml2LXNtYi5mcjpsb2xvbGlBOTw='}
@@ -110,11 +132,17 @@ class TCL:
             return ar
 
     def get_topo_req(self):
+        """
+        Load topo into var
+        """
         self.topo['METRO'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-metro-et-funiculaire-du-reseau-tcl-grand-lyon&q=&rows=10000&facet=geo_point_2d&facet=code_titan&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1").json()['records']
         self.topo['BUS'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-bus-du-reseau-tcl-grand-lyon&q=&rows=10000&facet=sens&facet=infos&facet=couleur&facet=last_upd_1").json()['records']
         self.topo['TRAM'] = requests.get("https://public.opendatasoft.com/api/records/1.0/search/?dataset=lignes-de-tramway-du-reseau-tcl-grand-lyon&q=&rows=10000&facet=geo_point_2d&facet=code_titan&facet=ligne&facet=sens&facet=libelle&facet=ut&facet=couleur&facet=last_upd_1").json()['records']
 
     def get_topo(self, station):
+        """
+			Return the topography of lines linked to the station
+		"""
         res = []
         def recherche(dict_c, nom, res):
             for i in dict_c:

@@ -5,6 +5,10 @@ import datetime
 import pandas as pd
 import os
 class RTM:
+    """
+    This class process all request for Marseille/RTM network.
+    All answers are standardized.
+    """
     def __init__(self) -> None:
         self.network = "Marseille"
         self.static_path = settings.STATICFILES_DIRS[0]
@@ -14,6 +18,10 @@ class RTM:
 
 
     def create_stations_db(self):
+        """
+			Add stations to DB
+			To prevent duplicates, the method return the list of inserted stations
+		"""
         newDf = self.df.loc[:, 'stop_name'].drop_duplicates()
         for i in newDf.index:
             lat = self.df[self.df["stop_name"] == newDf[i]]['lat'].values[0]
@@ -21,6 +29,9 @@ class RTM:
             add_station_db(station = newDf[i], network= self.network, lat=lat, lon=lon)
 
     def rechercheService(self,stop_id, jour):
+        """
+        Find correct service for a stop_id and day given
+        """
         heure = []
         id_route = list(self.df[self.df['stop_id'] == stop_id]['id_route'])[0]
         trip = list(set(self.trips[self.trips['route_id'] == id_route]['service_id']))
@@ -30,6 +41,9 @@ class RTM:
                 return t
 
     def rechercheHeure(self,stop_id, jour):
+        """
+        Return all hours for a stop and a day (monday ...)
+        """
         path = "./dataV2/"
         service = self.rechercheService(stop_id, jour)
         type_transport = list(self.df[self.df['stop_id'] == stop_id]['type'])[0]
@@ -38,6 +52,9 @@ class RTM:
         return sorted(data[data['trip_id'].isin(ensembleTrips)]['departure_time'])
 
     def get_station_next_depart(self, station):
+        """
+			Get 3 next departures at a given station
+		"""
         data = []
         actuel = datetime.datetime.now().strftime('%H:%M:%S')
         semaine = {0: 'monday',1: 'tuesday',2: 'wednesday',3: 'thursday',4: 'friday',5:'saturday',6: 'sunday'}

@@ -9,7 +9,7 @@ const FreqChart = ({station, line}) => {
 
     const fetchFreq = () => {
 		axios
-		.get('http://localhost:8000/api/transport/frequentation/'+line+'/'+station.network)
+		.get('https://moov-api.herokuapp.com/api/transport/frequentation/'+line+'/'+station.network)
         .then(response => {
             updateStationFreq(response.data.frequentation);
             updateData({

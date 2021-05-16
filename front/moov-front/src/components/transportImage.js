@@ -7,7 +7,7 @@ export default function TransportImage({transport, network, width, height, posit
 
     const fetchResults = () => {
         axios
-        .get('http://localhost:8000/api/transport/getimage/'+transport+'/'+network)
+        .get('https://moov-api.herokuapp.com/api/transport/getimage/'+transport+'/'+network)
         .then(response => {
             if (response.data.ctx.type === "png"){
                 updateImage("data:image/png;base64,"+response.data.ctx.image);

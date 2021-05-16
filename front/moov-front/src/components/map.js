@@ -22,7 +22,7 @@ export default function Map({station, loaded, updateLoaded}){
 
     const fetchStarLiveBus = () => {
       axios
-        .get("http://localhost:8000/api/transport/livebus/"+station.station+"/"+station.network)
+        .get("https://moov-api.herokuapp.com/api/transport/livebus/"+station.station+"/"+station.network)
         .then(response => {
           updateLiveBus(response.data.live);
           updateLoaded(loaded.add("live"));
@@ -31,7 +31,7 @@ export default function Map({station, loaded, updateLoaded}){
       }
 
     const fetchStarLines = () => {
-      axios.get("http://localhost:8000/api/transport/topo/"+station.station+"/"+station.network)
+      axios.get("https://moov-api.herokuapp.com/api/transport/topo/"+station.station+"/"+station.network)
       .then(response => {
           updateLines(response.data.topo);
           updateLoaded(loaded.add("topo"));

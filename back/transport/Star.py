@@ -10,10 +10,18 @@ from .tools import *
 
 class Star:
 	def __init__(self):
+		"""
+			RENNES - STAR NETWORK
+		"""
 		self.network = "Star"
 		self.city = "Rennes"
+		self.next_departures_cache = {}
+		self.station_lines_cache = {}
 
 	def get_bus_stations(self):
+		"""
+			Get all bus stations of the network
+		"""
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-pointsarret-td&q=&facet=nomstationparente&rows=10000"
 		res = request(url)
 		if len(res) > 0:
@@ -21,6 +29,9 @@ class Star:
 		return []
 
 	def get_metro_stations(self):
+		"""
+			Get all metro stations of the network
+		"""
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-topologie-pointsarret-td&q=&facet=nomstationparente&rows=10000"
 		res = request(url)
 		if len(res) > 0:
@@ -28,6 +39,10 @@ class Star:
 		return []
 
 	def add_to_db(self, data, stations):
+		"""
+			Add stations to DB
+			To prevent duplicates, the method return the list of inserted stations
+		"""
 		for station in data:
 			name = station.get("fields").get("nom")
 			if name not in stations:
@@ -38,20 +53,33 @@ class Star:
 
 
 	def create_stations_db(self):
+		"""
+			Insert stations into database
+			Download lines images
+		"""
 		stations = []
 		stations = self.add_to_db(self.get_metro_stations(), stations)
 		stations = self.add_to_db(self.get_bus_stations(), stations)
 		self.download_img_all()
 	
 	def get_live_bus(self):
+		"""
+			Get live bus
+		"""
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-vehicules-position-tr&q=&facet=numerobus&facet=nomcourtligne&facet=sens&facet=destination&rows=10000"
 		return request(url).get("records")
 
 	def get_bus_lines(self):
+		"""
+			Get bus lines
+		"""
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-lignes-td&q=&facet=nomfamillecommerciale&rows=10000"
 		return request(url).get("records")
 
 	def download_img_all(self):
+		"""
+			Download lines logos
+		"""
 		for transport in self.get_bus_lines():
 			self.download_img(transport)
 
@@ -88,14 +116,28 @@ class Star:
  		url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-{transport_type}-topologie-dessertes-td&q=&facet=libellecourtparcours&facet=nomcourtligne&facet=nomarret&facet=estmonteeautorisee&facet=estdescenteautorisee&refine.nomarret={station}"
  		return set([line.get("fields").get("nomcourtligne") for line in request(url).get("records")])
 
+	def get_station_lines_cache(self, station):
+		if len(self.station_lines_cache) and station in self.station_lines_cache.keys():
+			return self.station_lines_cache[station]
+		else:
+			station_lines = self.get_station_lines(station)
+			self.station_lines_cache[station] = station_lines
+			return station_lines
+
 	def get_topo(self, station):
+		"""
+			Return the topography of lines linked to the station
+		"""
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000"
 		res = []
-		station_lines = self.get_station_lines(station)
-		current_lines = [rec.get("line") for rec in self.get_station_next_depart(station)]
 
+		if len(self.next_departures_cache) and station in self.next_departures_cache.keys():
+			current_lines = set([rec.get("line") for rec in self.next_departures_cache[station]])
+		else:
+			current_lines = set([rec.get("line") for rec in self.get_station_next_depart(station)])
+		
 		for record in request(url).get("records"):
-			if record.get("fields").get("nomcourtligne") in station_lines and record.get("fields").get("nomcourtligne") in current_lines:
+			if record.get("fields").get("nomcourtligne") in current_lines:
 				res.append(record)
 
 		metro_url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-metro-topologie-parcours-td&q=&facet=idligne&facet=nomcourtligne&facet=senscommercial&facet=type&facet=nomarretdepart&facet=nomarretarrivee&facet=estaccessiblepmr&rows=10000&refine.nomcourtligne=a"
@@ -104,6 +146,9 @@ class Star:
 		return self.convert_coor_topo(res)
 
 	def convert_coor_topo(self, records):
+		"""
+			Invert coordinates to match Leaflet requirements
+		"""
 		for index, record in enumerate(records):
 			for coor_index, coor in enumerate(record.get("fields").get("parcours").get("coordinates")):
 				records[index]["fields"]["parcours"]["coordinates"][coor_index] = [coor[1], coor[0]]
@@ -111,6 +156,9 @@ class Star:
 		return records
 
 	def convert_coor_live(self, records):
+		"""
+			Invert coordinates to match Leaflet requirements
+		"""
 		for index, record in enumerate(records):
 			coor = record["geometry"]["coordinates"]
 			records[index]["geometry"]["coordinates"] = [coor[1], coor[0]]
@@ -118,16 +166,22 @@ class Star:
 		return records
 
 	def get_live_bus_station(self, station):
-		station_lines = self.get_station_lines(station)
+		"""
+			Get live bus for a given station
+			The method get the lines linked to the station and filter live buses in function of these lines
+		"""
 		res = []
 
 		for record in self.get_live_bus():
-			if record.get("fields").get("nomcourtligne") in station_lines:
+			if record.get("fields").get("nomcourtligne") in self.get_station_lines_cache(station):
 				res.append(record)		
 		return self.convert_coor_live(res)
 
 	
 	def check_dt(self, dt):
+		"""
+			Check if datetime > now
+		"""
 		dt_obj = datetime.datetime.strptime(dt.split('+')[0], '%Y-%m-%dT%H:%M:%S')
 		current_tz = tz.gettz("Europe/Paris")
 		utc_now = datetime.datetime.now()
@@ -138,18 +192,28 @@ class Star:
 		return False
 
 	def add_0_to_dt(self, dt):
+		"""
+			Add 0 to string datetime
+			Ex : 1:10 -> 01:10
+		"""
 		for key, value in dt.items():
 			if len(str(value)) == 1:
 				dt[key] = "0"+str(value)
 		return dt
 
 	def convert_dt_string(self, dt):
+		"""
+			Convert datetime in string format hh:mm
+		"""
 		dt_obj = datetime.datetime.strptime(dt.split('+')[0], '%Y-%m-%dT%H:%M:%S')
 		dt_obj_str = self.add_0_to_dt({"hour": dt_obj.hour, "min": dt_obj.minute})
 
 		return f"{dt_obj_str['hour']}:{dt_obj_str['min']}"
 
 	def format_next_departures(self, records):
+		"""
+			Format recorded next departures
+		"""
 		data = []
 
 		for line, line_value in records.items():
@@ -159,6 +223,9 @@ class Star:
 		return data
 
 	def get_station_lines_names(self, station):
+		"""
+			Get lines names for a given station
+		"""
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-dessertes-td&q=&sort=idparcours&facet=libellecourtparcours&facet=nomcourtligne&facet=nomarret&facet=estmonteeautorisee&facet=estdescenteautorisee&refine.nomarret={}".format(station)
 		station_lines = request(url).get("records")
 
@@ -169,6 +236,9 @@ class Star:
 		return set([line.get("fields").get("nomcourtligne") for line in station_lines])
 
 	def get_station_next_depart(self, station):
+		"""
+			Get all next departures at a given station
+		"""
 		data = {}
 		#bus
 		url = "https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-bus-topologie-dessertes-td&q=&sort=idparcours&facet=libellecourtparcours&facet=nomcourtligne&facet=nomarret&facet=estmonteeautorisee&facet=estdescenteautorisee&refine.nomarret={}".format(station)
@@ -205,17 +275,21 @@ class Star:
 
 				if self.check_dt(rec.get("fields").get(depart_var)) and len(data[line][dest]["next_departures"]) < 3:
 					data[line][dest]["next_departures"].append(self.convert_dt_string(rec.get("fields").get(depart_var)))
+		res = self.format_next_departures(data)
+		self.next_departures_cache = {station: res}
+		return res
 
-		return self.format_next_departures(data)
 
-
-	def get_alertes_trafic(self, id_station, type_a):
+	def get_alertes_trafic(self):
+		"""
+			Get all trafic alerts for a given network
+		"""
 		alertes = request('https://data.explore.star.fr/api/records/1.0/search/?dataset=tco-busmetro-trafic-alertes-tr&q=&rows=10000&facet=niveau&facet=debutvalidite&facet=finvalidite&facet=idligne&facet=nomcourtligne&timezone=Europe/Paris').get('records')
 		res = {}
 		res['BUS'] = []
 		res['METRO'] = []
 		res['TRAM'] = []
-		station_lines = self.get_station_lines(id_station)
+
 		for alerte in alertes:
 			if alerte['fields']['niveau'] == "Majeure":
 				dt = datetime.datetime.strptime(alerte["fields"]['debutvalidite'].split("+")[0], "%Y-%m-%dT%H:%M:%S")
@@ -252,6 +326,9 @@ class Star:
 		return self.format_line_frequentation(res)
 
 	def format_line_frequentation(self, records):
+		"""
+			Format the line frequentations data to display it in a chart
+		"""
 		labels = []
 		values = []
 
