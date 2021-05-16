@@ -1,12 +1,12 @@
-from datetime import datetime, time
+from datetime import datetime
 from .tools import *
 from django.conf import settings
 import datetime
 import pandas as pd
-import os
+
 class RTM:
     """
-    This class process all request for Marseille/RTM network.
+    This class processes all requests for Marseille/RTM network.
     All answers are standardized.
     """
     def __init__(self) -> None:
@@ -20,7 +20,7 @@ class RTM:
     def create_stations_db(self):
         """
 			Add stations to DB
-			To prevent duplicates, the method return the list of inserted stations
+			To prevent duplicates, the method returns the list of inserted stations
 		"""
         newDf = self.df.loc[:, 'stop_name'].drop_duplicates()
         for i in newDf.index:
@@ -30,7 +30,7 @@ class RTM:
 
     def rechercheService(self,stop_id, jour):
         """
-        Find correct service for a stop_id and day given
+        Find correct service for a given stop_id and day
         """
         heure = []
         id_route = list(self.df[self.df['stop_id'] == stop_id]['id_route'])[0]
@@ -42,7 +42,7 @@ class RTM:
 
     def rechercheHeure(self,stop_id, jour):
         """
-        Return all hours for a stop and a day (monday ...)
+        Return all hours for a stop on a given a day
         """
         path = "./dataV2/"
         service = self.rechercheService(stop_id, jour)
@@ -53,7 +53,7 @@ class RTM:
 
     def get_station_next_depart(self, station):
         """
-			Get 3 next departures at a given station
+			Get 3 next departures for a given station
 		"""
         data = []
         actuel = datetime.datetime.now().strftime('%H:%M:%S')

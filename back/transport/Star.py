@@ -168,7 +168,7 @@ class Star:
 	def get_live_bus_station(self, station):
 		"""
 			Get live bus for a given station
-			The method get the lines linked to the station and filter live buses in function of these lines
+			The method gathers all the lines associated to the given station and fetch the live buses accordingly
 		"""
 		res = []
 
@@ -237,7 +237,7 @@ class Star:
 
 	def get_station_next_depart(self, station):
 		"""
-			Get all next departures at a given station
+			Get all next departures for a given station
 		"""
 		data = {}
 		#bus

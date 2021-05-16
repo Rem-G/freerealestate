@@ -2,7 +2,6 @@ from .models import Station
 import requests
 import base64
 from django.conf import settings
-import shutil
 from pathlib import Path
 import os.path
 
