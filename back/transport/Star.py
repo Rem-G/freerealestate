@@ -168,7 +168,7 @@ class Star:
 	def get_live_bus_station(self, station):
 		"""
 			Get live bus for a given station
-			The method get the lines linked to the station and filter live buses in function of these lines
+			The method gathers all the lines associated to the given station and fetch the live buses accordingly
 		"""
 		res = []
 
@@ -237,7 +237,7 @@ class Star:
 
 	def get_station_next_depart(self, station):
 		"""
-			Get all next departures at a given station
+			Get all next departures for a given station
 		"""
 		data = {}
 		#bus
@@ -321,6 +321,7 @@ class Star:
 			day_string = "Samedi"
 		elif weekday == 6:
 			day_string = "Dimanche"
+		day_string = "Lundi-vendredi"
 
 		url = f"https://data.explore.star.fr/api/records/1.0/search/?dataset=mkt-frequentation-niveau-freq-max-ligne&q=&sort=tranche_horaire&facet=materiel&facet=jour_semaine&facet=ligne&facet=tranche_horaire&facet=frequentation&facet=niveau_frequentation&refine.ligne={line}&refine.jour_semaine={day_string}&rows=100"
 		res = request(url).get("records")
